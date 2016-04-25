@@ -1,0 +1,27 @@
+﻿@model List<Google.Apis.Calendar.v3.Data.Event>
+@{
+    ViewBag.Title = "Index";
+    string when;
+}
+
+<h2>Events names :</h2>
+
+<ul>
+    @foreach (var item in Model) {
+        <li>
+            @{
+                when = item.Start.DateTime.ToString();
+                if (String.IsNullOrEmpty(when)) {
+                    when = item.Start.Date;
+                }
+                string title = item.Summary;
+
+            }
+            title : @title,
+            time : @when
+        </li>
+    }
+</ul>
+
+
+

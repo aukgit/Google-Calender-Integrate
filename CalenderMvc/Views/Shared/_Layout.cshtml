@@ -6,6 +6,8 @@
     <title>@ViewBag.Title - My ASP.NET Application</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/kendo/kendo.default.css" rel="stylesheet" />
+    <link href="~/Content/kendo/kendo.common.css" rel="stylesheet" />
 
 </head>
 <body>
@@ -24,6 +26,7 @@
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                    <li>@Html.ActionLink("Scheduler", "Index", "Scheduler")</li>
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>
