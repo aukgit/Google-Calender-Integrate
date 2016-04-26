@@ -1,11 +1,7 @@
-﻿
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using CalenderMvc.Modules.GoogleCalender;
-
-namespace CalenderMvc.Controllers
-{
-    public class SchedulerController : Controller
-    {
+namespace CalenderMvc.Controllers {
+    public class SchedulerController : Controller {
         // GET: Scheduler
         public ActionResult Index() {
             return View();
