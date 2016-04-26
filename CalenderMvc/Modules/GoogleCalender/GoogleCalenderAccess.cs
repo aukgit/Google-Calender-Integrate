@@ -9,6 +9,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,78 +26,7 @@ namespace CalenderMvc.Modules.GoogleCalender {
         private UserCredential _credentials;
 
 
-        private void SendReq() {
-            string gurl = "client_id=" + ConfigurationManager.AppSettings["GoogleClientId"] +
-                          "&client_secret=" + ConfigurationManager.AppSettings["GoogleClientSecret"];
-
-            string url = "https://www.googleapis.com/oauth2/v3/token";
-
-            // creates the post data for the POST request
-            string postData = (gurl);
-
-            // create the POST request
-            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(url);
-            webRequest.Host = "www.googleapis.com";
-
-            webRequest.Method = "POST";
-            webRequest.ContentType = "application/x-www-form-urlencoded";
-            webRequest.ContentLength = postData.Length;
-
-            // POST the data
-            using (StreamWriter requestWriter2 = new StreamWriter(webRequest.GetRequestStream())) {
-                requestWriter2.Write(postData);
-            }
-
-            //This actually does the request and gets the response back
-            HttpWebResponse resp = (HttpWebResponse)webRequest.GetResponse();
-
-            string googleAuth;
-
-            using (StreamReader responseReader = new StreamReader(webRequest.GetResponse().GetResponseStream())) {
-                //dumps the HTML from the response into a string variable
-                googleAuth = responseReader.ReadToEnd();
-            }
-        }
-        /// <summary>
-        /// Authenticating to Google using a Service account
-        /// Documentation: https://developers.google.com/accounts/docs/OAuth2#serviceaccount
-        /// </summary>
-        /// <param name="serviceAccountEmail">From Google Developer console https://console.developers.google.com</param>
-        /// <param name="keyFilePath">Location of the Service account key file downloaded from Google Developer console https://console.developers.google.com</param>
-        /// <returns></returns>
-        public static CalendarService AuthenticateServiceAccount(string serviceAccountEmail, string keyFilePath) {
-
-            // check the file exists
-            if (!File.Exists(keyFilePath)) {
-                Console.WriteLine("An Error occurred - Key file does not exist");
-                return null;
-            }
-
-            string[] scopes = new string[] {
-        CalendarService.Scope.Calendar  ,  // Manage your calendars
-        CalendarService.Scope.CalendarReadonly    // View your Calendars
-            };
-
-            var certificate = new X509Certificate2(keyFilePath, "notasecret", X509KeyStorageFlags.Exportable);
-            try {
-                ServiceAccountCredential credential = new ServiceAccountCredential(
-                    new ServiceAccountCredential.Initializer(serviceAccountEmail) {
-                        Scopes = scopes
-                    }.FromCertificate(certificate));
-
-                // Create the service.
-                CalendarService service = new CalendarService(new BaseClientService.Initializer() {
-                    HttpClientInitializer = credential,
-                    ApplicationName = "Calendar API Sample",
-                });
-                return service;
-            } catch (Exception ex) {
-
-                Console.WriteLine(ex.InnerException);
-                return null;
-
-            }
-        }
+        
         private ClientSecrets GetClientSerects() {
             if (_secrects == null) {
                 _secrects = new ClientSecrets() {
@@ -107,21 +37,24 @@ namespace CalenderMvc.Modules.GoogleCalender {
             return _secrects;
         }
 
-        private UserCredential GetCredentials() {
+        private UserCredential GetCredentials(string userEmailAddress) {
             if (_credentials == null) {
                 var flow = new GoogleAuthorizationCodeFlow(new GoogleAuthorizationCodeFlow.Initializer {
-                        ClientSecrets = GetClientSerects(),
-                        Scopes = _scopes
-                    });
-                var token = flow.LoadTokenAsync("user", CancellationToken.None).Result;
-                _credentials = new UserCredential(flow,
-                "user",
-                token);
+                    ClientSecrets = GetClientSerects(),
+                    Scopes = _scopes
+                });
+                var token = flow.LoadTokenAsync(userEmailAddress, CancellationToken.None).Result;
+                _credentials = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                GetClientSerects(),
+                _scopes,
+                userEmailAddress,
+                CancellationToken.None,
+                new FileDataStore("Daimto.GoogleCalendar.Auth.Store")).Result;
             }
             return _credentials;
         }
-        private CalendarService GetService() {
-            var credentials = GetCredentials();
+        private CalendarService GetService(string userEmailAddress) {
+            var credentials = GetCredentials(userEmailAddress);
             // Create Google Calendar API service.
             var service = new CalendarService(new BaseClientService.Initializer() {
                 HttpClientInitializer = credentials,
@@ -130,9 +63,8 @@ namespace CalenderMvc.Modules.GoogleCalender {
             return service;
         }
 
-        public Events GetEvents(string calenderType = "primary", int max = 10) {
-            SendReq();
-            var service = GetService();
+        public Events GetEvents(string userEmailAddress,string calenderType = "primary", int max = 10) {
+            var service = GetService(userEmailAddress);
 
             // Define parameters of request.
             EventsResource.ListRequest request = service.Events.List(calenderType);

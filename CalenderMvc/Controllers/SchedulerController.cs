@@ -8,10 +8,15 @@ namespace CalenderMvc.Controllers
     {
         // GET: Scheduler
         public ActionResult Index() {
-            var googleCalender = new GoogleCalenderAccess();
+            return View();
+        }
 
-            var events = googleCalender.GetEvents(max: 100);
-            return View(events);
+        [HttpPost]
+        public ActionResult Index(string userEmailAdress) {
+            var googleCalender = new GoogleCalenderAccess();
+            var events = googleCalender.GetEvents(userEmailAdress, max: 100);
+            ViewBag.events = events.Items;
+            return View("ListEvents");
         }
     }
 }

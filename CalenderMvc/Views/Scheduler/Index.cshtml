@@ -1,27 +1,22 @@
-﻿@model List<Google.Apis.Calendar.v3.Data.Event>
-@{
+﻿@{
     ViewBag.Title = "Index";
-    string when;
 }
 
-<h2>Events names :</h2>
-
-<ul>
-    @foreach (var item in Model) {
-        <li>
-            @{
-                when = item.Start.DateTime.ToString();
-                if (String.IsNullOrEmpty(when)) {
-                    when = item.Start.Date;
-                }
-                string title = item.Summary;
-
-            }
-            title : @title,
-            time : @when
-        </li>
-    }
-</ul>
-
-
+<h2>Type your gmail account:</h2>
+<hr />
+@using (Html.BeginForm("Index", "Scheduler", FormMethod.Post, new { @class = "form-horizontal", role = "form" })) {
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    <div class="form-group">
+        <div class="col-md-2">@Html.Label("Email Address", new { @class = "control-label" })</div>
+        <div class="col-md-10">
+            @Html.TextBox("userEmailAdress", "", new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" class="btn btn-default" value="Get Calender Data" />
+        </div>
+    </div>
+}
 

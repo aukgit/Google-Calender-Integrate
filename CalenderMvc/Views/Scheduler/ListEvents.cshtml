@@ -1,0 +1,27 @@
+﻿@{
+    ViewBag.Title = "Index";
+    var events = (IList<Event>)ViewBag.events;
+    string when;
+}
+<h2>Events names :</h2>
+<ul>
+    @if (events != null) {
+        foreach (var item in events) {
+            <li>
+                @{
+            when = item.Start.DateTime.ToString();
+            if (String.IsNullOrEmpty(when)) {
+                when = item.Start.Date;
+            }
+            string title = item.Summary;
+
+                }
+                title : @title,
+                time : @when
+            </li>
+        }
+    }
+</ul>
+
+
+
