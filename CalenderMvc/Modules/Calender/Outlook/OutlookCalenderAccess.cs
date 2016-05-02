@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Office365;
-using Microsoft.Office365.Discovery;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-using System.Web.UI.WebControls;
-using Microsoft.Experimental.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.Office365.OutlookServices;
-using Org.BouncyCastle.Asn1.Ocsp;
+﻿
 
 namespace CalenderMvc.Modules.Calender.Outlook {
     public class OutlookCalenderAccess {
