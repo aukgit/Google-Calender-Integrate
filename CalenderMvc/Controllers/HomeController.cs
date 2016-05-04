@@ -13,7 +13,8 @@ namespace CalenderMvc.Controllers {
             return View();
         }
         // The required scopes for our app
-        private static string[] scopes = { "https://outlook.office.com/mail.read" };
+        private static string[] scopes = { "https://outlook.office.com/mail.read",
+                                   "https://outlook.office.com/calendars.read" };
         public async Task<ActionResult> SignIn() {
             string authority = "https://login.microsoftonline.com/common";
             string clientId = System.Configuration.ConfigurationManager.AppSettings["ida:ClientID"];
@@ -127,6 +128,36 @@ namespace CalenderMvc.Controllers {
                 return View(mailResults.CurrentPage);
             } catch (AdalException ex) {
                 return Content(string.Format("ERROR retrieving messages: {0}", ex.Message));
+            }
+        }
+
+        public async Task<ActionResult> Calendar() {
+            string token = (string)Session["access_token"];
+            string email = (string)Session["user_email"];
+            if (string.IsNullOrEmpty(token)) {
+                // If there's no token in the session, redirect to Home
+                return Redirect("/");
+            }
+
+            try {
+                OutlookServicesClient client = new OutlookServicesClient(new Uri("https://outlook.office.com/api/v2.0"),
+                    async () => {
+                        // Since we have it locally from the Session, just return it here.
+                        return token;
+                    });
+
+                client.Context.SendingRequest2 += new EventHandler<Microsoft.OData.Client.SendingRequest2EventArgs>(
+                   (sender, e) => InsertXAnchorMailboxHeader(sender, e, email));
+
+                var eventResults = await client.Me.Events
+                                    .OrderByDescending(e => e.Start.DateTime)
+                                    .Take(10)
+                                    .Select(e => new Models.DisplayEvent(e.Subject, e.Start.DateTime, e.End.DateTime))
+                                    .ExecuteAsync();
+
+                return View(eventResults.CurrentPage);
+            } catch (AdalException ex) {
+                return Content(string.Format("ERROR retrieving events: {0}", ex.Message));
             }
         }
 
