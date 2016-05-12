@@ -20,7 +20,7 @@ namespace CalenderMvc.Controllers {
             string clientId = System.Configuration.ConfigurationManager.AppSettings["ida:ClientID"];
             AuthenticationContext authContext = new AuthenticationContext(authority);
 
-            // The url in our app that Azure should redirect to after successful signin
+            // The url in our app that Azure should redirect to after successful sign in
             Uri redirectUri = new Uri(Url.Action("Authorize", "Home", null, Request.Url.Scheme));
 
             // Generate the parameterized URL for Azure signin
@@ -102,8 +102,8 @@ namespace CalenderMvc.Controllers {
         }
 
         public async Task<ActionResult> Inbox() {
-            string token = (string)Session["access_token"];
-            string email = (string)Session["user_email"];
+            string token = (string) Session["access_token"];
+            string email = (string) Session["user_email"];
             if (string.IsNullOrEmpty(token)) {
                 // If there's no token in the session, redirect to Home
                 return Redirect("/");
@@ -132,8 +132,8 @@ namespace CalenderMvc.Controllers {
         }
 
         public async Task<ActionResult> Calendar() {
-            string token = (string)Session["access_token"];
-            string email = (string)Session["user_email"];
+            string token = (string) Session["access_token"];
+            string email = (string) Session["user_email"];
             if (string.IsNullOrEmpty(token)) {
                 // If there's no token in the session, redirect to Home
                 return Redirect("/");
