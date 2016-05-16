@@ -1,8 +1,9 @@
-﻿using Microsoft.Owin;
+﻿using CalendarMvc;
+using Microsoft.Owin;
 using Owin;
 
-[assembly: OwinStartupAttribute(typeof(CalenderMvc.Startup))]
-namespace CalenderMvc
+[assembly: OwinStartup(typeof(Startup))]
+namespace CalendarMvc
 {
     public partial class Startup
     {

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
-namespace CalenderMvc.Models {
+namespace CalendarMvc.Models {
     public class DisplayEvent {
         public string Subject { get; set; }
         public DateTime Start { get; set; }

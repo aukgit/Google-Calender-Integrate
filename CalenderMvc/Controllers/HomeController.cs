@@ -5,7 +5,7 @@ using System.Web.Mvc;
 using Microsoft.Experimental.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Office365.OutlookServices;
 
-namespace CalenderMvc.Controllers {
+namespace CalendarMvc.Controllers {
     public class HomeController : Controller {
         // followed from https://dev.outlook.com/restapi/tutorial/dotnet
 

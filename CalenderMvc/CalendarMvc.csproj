@@ -11,8 +11,8 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CalenderMvc</RootNamespace>
-    <AssemblyName>CalenderMvc</AssemblyName>
+    <RootNamespace>CalendarMvc</RootNamespace>
+    <AssemblyName>CalendarMvc</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
@@ -240,8 +240,9 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\KendoSchedulerViewModel.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
-    <Compile Include="Modules\Calender\Google\GoogleCalenderAccess.cs" />
-    <Compile Include="Modules\Calender\Outlook\OutlookCalenderAccess.cs" />
+    <Compile Include="Models\OutlookToken.cs" />
+    <Compile Include="Modules\Calendar\Google\GoogleCalendarAccess.cs" />
+    <Compile Include="Modules\Calendar\Outlook\OutlookCalendarAccess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>

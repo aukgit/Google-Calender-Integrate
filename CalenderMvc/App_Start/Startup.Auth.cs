@@ -1,13 +1,12 @@
 ﻿using System;
+using CalendarMvc.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.Google;
 using Owin;
-using CalenderMvc.Models;
 
-namespace CalenderMvc
+namespace CalendarMvc
 {
     public partial class Startup
     {

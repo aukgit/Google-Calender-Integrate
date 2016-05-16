@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
-namespace CalenderMvc.Models {
+namespace CalendarMvc.Models {
     public class DisplayMessage {
         public string Subject { get; set; }
         public DateTimeOffset DateTimeReceived { get; set; }

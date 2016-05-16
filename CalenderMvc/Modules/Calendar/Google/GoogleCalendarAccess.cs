@@ -8,8 +8,8 @@ using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 
-namespace CalenderMvc.Modules.Calender.Google {
-    public class GoogleCalenderAccess {
+namespace CalendarMvc.Modules.Calendar.Google {
+    public class GoogleCalendarAccess {
         // If modifying these scopes, delete your previously saved credentials
         // at ~/.credentials/calendar-dotnet-quickstart.json
         private string[] _scopes = { CalendarService.Scope.CalendarReadonly, CalendarService.Scope.Calendar };

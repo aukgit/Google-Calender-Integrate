@@ -1,11 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-using System.Linq;
-using CalenderMvc.Models;
+﻿using System.Web.Mvc;
 
-
-namespace CalenderMvc.Controllers {
+namespace CalendarMvc.Controllers {
     public class SchedulerController : Controller {
 
         private static string[] scopes = { "https://outlook.office.com/mail.read" };

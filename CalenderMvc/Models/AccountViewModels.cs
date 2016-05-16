@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace CalenderMvc.Models
+namespace CalendarMvc.Models
 {
     public class ExternalLoginConfirmationViewModel
     {
