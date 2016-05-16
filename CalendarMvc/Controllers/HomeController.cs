@@ -34,8 +34,10 @@ namespace CalendarMvc.Controllers {
             var outlookToken = await outlookAccess.GetAccessToken(authCode, redirectUri);
             if (outlookToken != null) {
                 Session["token"] = outlookToken;
-                db.OutlookTokens.Add(outlookToken);
-                db.SaveChanges();
+                if (!db.OutlookTokens.Any(n => n.Token == outlookToken.Token)) {
+                    db.OutlookTokens.Add(outlookToken);
+                    db.SaveChanges();
+                }
                 return RedirectToAction("Index");
             }
             return HttpNotFound();
