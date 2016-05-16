@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CalendarMvc.Models {
+namespace CalendarMvc.Models.ViewModel {
     public class KendoSchedulerViewModel {
         public string Title { get; set; }
         public DateTime Start { get; set; }

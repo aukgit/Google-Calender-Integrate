@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using CalendarMvc.Models.ViewModel;
 using Microsoft.Experimental.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Office365.OutlookServices;
 
@@ -122,7 +123,7 @@ namespace CalendarMvc.Controllers {
                 var mailResults = await client.Me.Messages
                                   .OrderByDescending(m => m.ReceivedDateTime)
                                   .Take(10)
-                                  .Select(m => new Models.DisplayMessage(m.Subject, m.ReceivedDateTime, m.From))
+                                  .Select(m => new DisplayMessage(m.Subject, m.ReceivedDateTime, m.From))
                                   .ExecuteAsync();
 
                 return View(mailResults.CurrentPage);
@@ -152,7 +153,7 @@ namespace CalendarMvc.Controllers {
                 var eventResults = await client.Me.Events
                                     .OrderByDescending(e => e.Start.DateTime)
                                     .Take(10)
-                                    .Select(e => new Models.DisplayEvent(e.Subject, e.Start.DateTime, e.End.DateTime))
+                                    .Select(e => new DisplayEvent(e.Subject, e.Start.DateTime, e.End.DateTime))
                                     .ExecuteAsync();
 
                 return View(eventResults.CurrentPage);

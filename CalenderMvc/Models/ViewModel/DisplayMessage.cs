@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CalendarMvc.Models {
+namespace CalendarMvc.Models.ViewModel {
     public class DisplayMessage {
         public string Subject { get; set; }
         public DateTimeOffset DateTimeReceived { get; set; }

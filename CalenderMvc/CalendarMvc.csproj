@@ -234,12 +234,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\DisplayEvent.cs" />
-    <Compile Include="Models\DisplayMessage.cs" />
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\ViewModel\AccountViewModels.cs" />
+    <Compile Include="Models\ViewModel\DisplayEvent.cs" />
+    <Compile Include="Models\ViewModel\DisplayMessage.cs" />
     <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\KendoSchedulerViewModel.cs" />
-    <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\ViewModel\KendoSchedulerViewModel.cs" />
+    <Compile Include="Models\ViewModel\ManageViewModels.cs" />
     <Compile Include="Models\OutlookToken.cs" />
     <Compile Include="Modules\Calendar\Google\GoogleCalendarAccess.cs" />
     <Compile Include="Modules\Calendar\Outlook\OutlookCalendarAccess.cs" />
@@ -247,6 +248,10 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\aspnet-CalenderMvc-20160421040947.mdf" />
+    <Content Include="App_Data\aspnet-CalenderMvc-20160421040947_log.ldf">
+      <DependentUpon>aspnet-CalenderMvc-20160421040947.mdf</DependentUpon>
+    </Content>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\Font-Awesome\css\font-awesome.min.css" />

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using CalendarMvc.Models;
+using CalendarMvc.Models.ViewModel;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;

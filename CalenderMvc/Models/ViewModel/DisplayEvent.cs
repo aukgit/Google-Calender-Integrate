@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CalendarMvc.Models {
+namespace CalendarMvc.Models.ViewModel {
     public class DisplayEvent {
         public string Subject { get; set; }
         public DateTime Start { get; set; }

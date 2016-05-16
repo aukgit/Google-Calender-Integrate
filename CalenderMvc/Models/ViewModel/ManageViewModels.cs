@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 
-namespace CalendarMvc.Models
+namespace CalendarMvc.Models.ViewModel
 {
     public class IndexViewModel
     {
