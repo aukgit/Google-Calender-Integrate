@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CalendarMvc.Models;
 using Microsoft.Experimental.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.Office365.OutlookServices;
 
 namespace CalendarMvc.Modules.Calendar.Outlook {
     public class OutlookCalendarAccess {
@@ -10,6 +11,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         string authority = "https://login.microsoftonline.com/common";
         string clientId = System.Configuration.ConfigurationManager.AppSettings["ida:ClientID"];
         string clientSecret = System.Configuration.ConfigurationManager.AppSettings["ida:ClientSecret"];
+        string outlookApiEndpoint = "https://outlook.office.com/api/v2.0";
         private static string[] scopes = { "https://outlook.office.com/mail.read",
                                    "https://outlook.office.com/calendars.read" };
         /// <summary>
@@ -29,6 +31,20 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             return authUri.ToString();
         }
 
+        public async Task<OutlookServicesClient> GetOutlookClient(OutlookToken outlookToken) {
+            var client = new OutlookServicesClient(new Uri(outlookApiEndpoint),
+               async () => {
+                   // Since we have it locally from the Session, just return it here.
+                   return outlookToken.Token;
+               });
+
+            client.Context.SendingRequest2 += (sender, e) => InsertXAnchorMailboxHeader(sender, e, outlookToken.Email);
+            return client;
+        }
+
+        private void InsertXAnchorMailboxHeader(object sender, Microsoft.OData.Client.SendingRequest2EventArgs e, string email) {
+            e.RequestMessage.SetHeader("X-AnchorMailbox", email);
+        }
         public ClientCredential GetCredentials() {
             return new ClientCredential(clientId, clientSecret);
         }
