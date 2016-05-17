@@ -44,6 +44,10 @@
       <HintPath>..\packages\BouncyCastle.1.7.0\lib\Net40-Client\BouncyCastle.Crypto.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="DevMvcComponent, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevMVCComponent.2.3.0\lib\DevMvcComponent.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Google.Apis, Version=1.11.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Apis.1.11.1\lib\net45\Google.Apis.dll</HintPath>
       <Private>True</Private>
@@ -256,6 +260,7 @@
     <Compile Include="Models\ViewModel\KendoSchedulerViewModel.cs" />
     <Compile Include="Models\ViewModel\ManageViewModels.cs" />
     <Compile Include="Models\OutlookToken.cs" />
+    <Compile Include="Models\ViewModel\OutlookTokenViewModel.cs" />
     <Compile Include="Modules\Calendar\Google\GoogleCalendarAccess.cs" />
     <Compile Include="Modules\Calendar\Outlook\OutlookCalendarAccess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

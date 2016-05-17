@@ -12,6 +12,8 @@ namespace CalendarMvc
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            
+            DevMvcComponent.Mvc.Setup(System.Reflection.Assembly.GetExecutingAssembly());
         }
     }
 }

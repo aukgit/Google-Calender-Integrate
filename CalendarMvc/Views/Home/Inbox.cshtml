@@ -1,45 +1,65 @@
-﻿@model IEnumerable<CalendarMvc.Models.ViewModel.DisplayMessage>
+﻿@model List<CalendarMvc.Models.ViewModel.OutlookTokenViewModel>
 
 @{
-    ViewBag.Title = "Inbox";
+    ViewBag.Title = "Inbox - Events";
+}
+<h2>Total Accounts : @Model.Count</h2>
+@foreach (var token in Model) {
+    <h2>Inbox : @token.Token.Substring(0,15)</h2>
+    <table class="table inbox">
+        <thead>
+        <tr>
+            <th>
+                Subject
+            </th>
+            <th>
+                Received
+            </th>
+            <th>
+                From
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var message in token.Messages) {
+            <tr>
+                <td>
+                    @message.Subject
+                </td>
+                <td>
+                    @message.DateTimeReceived
+                </td>
+                <td>
+                    @message.From
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <h2>Events : @token.Token.Substring(0, 15)</h2>
+    <table class="table events">
+        <thead>
+            <tr>
+                <th>
+                    Title
+                </th>
+                <th>
+                    Time
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var _event in token.Events) {
+                <tr>
+                    <td>
+                        @_event.Subject
+                    </td>
+                    <td>
+                        @_event.Start - @_event.End
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 
-<h2>Inbox</h2>
-
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Subject)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.DateTimeReceived)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.From)
-        </th>
-        <th></th>
-    </tr>
-
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Subject)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DateTimeReceived)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.From)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-        </td>
-    </tr>
-}
-
-</table>

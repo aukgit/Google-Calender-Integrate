@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using CalendarMvc.Models;
 using CalendarMvc.Models.ViewModel;
 using CalendarMvc.Modules.Calendar.Outlook;
+using DevMvcComponent.Extensions;
 using Microsoft.Experimental.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.Office365.OutlookServices;
 
 namespace CalendarMvc.Controllers {
     public class HomeController : Controller {
-        OutlookCalendarAccess outlookAccess = new OutlookCalendarAccess();
         private readonly ApplicationDbContext db = new ApplicationDbContext();
+        private readonly OutlookCalendarAccess outlookAccess = new OutlookCalendarAccess();
         // followed from https://dev.outlook.com/restapi/tutorial/dotnet
 
         public ActionResult Index() {
@@ -20,7 +21,7 @@ namespace CalendarMvc.Controllers {
 
         public async Task<ActionResult> SignIn() {
             // The url in our app that Azure should redirect to after successful sign in
-            Uri redirectUri = new Uri(Url.Action("Authorize", "Home", null, Request.Url.Scheme));
+            var redirectUri = new Uri(Url.Action("Authorize", "Home", null, Request.Url.Scheme));
             var microsoftSignInUrl = await outlookAccess.GetMicrosoftSignInUrl(redirectUri);
             // Redirect the browser to the Azure signin page
             return Redirect(microsoftSignInUrl);
@@ -28,12 +29,10 @@ namespace CalendarMvc.Controllers {
 
         public async Task<ActionResult> Authorize() {
             // Get the 'code' parameter from the Azure redirect
-            string authCode = Request.Params["code"];
-
-            Uri redirectUri = new Uri(Url.Action("Authorize", "Home", null, Request.Url.Scheme));
+            var authCode = Request.Params["code"];
+            var redirectUri = new Uri(Url.Action("Authorize", "Home", null, Request.Url.Scheme));
             var outlookToken = await outlookAccess.GetAccessToken(authCode, redirectUri);
             if (outlookToken != null) {
-                Session["token"] = outlookToken;
                 if (!db.OutlookTokens.Any(n => n.Token == outlookToken.Token)) {
                     db.OutlookTokens.Add(outlookToken);
                     db.SaveChanges();
@@ -44,46 +43,38 @@ namespace CalendarMvc.Controllers {
         }
 
         public async Task<ActionResult> Inbox() {
-            var outlookToken = (OutlookToken) Session["token"];
-            if (outlookToken == null) {
+            var outlookTokens = db.OutlookTokens
+                                  //.Select(n => new OutlookTokenViewModel {Token = n.Token, Email = n.Email, OutlookTokenID = n.OutlookTokenID})
+                                  .ToList();
+            if (outlookTokens.Count == 0) {
                 // If there's no token in the session, redirect to Home
                 return Redirect("/");
             }
+            var list = new List<OutlookTokenViewModel>(outlookTokens.Count + 2);
 
-            try {
-                var client = await  outlookAccess.GetOutlookClient(outlookToken);
+            foreach (var outlookToken in outlookTokens) {
+                var outlookTokenViewModel = outlookToken.Cast<OutlookToken, OutlookTokenViewModel>();
 
-                var mailResults = await client.Me.Messages
-                                  .OrderByDescending(m => m.ReceivedDateTime)
-                                  .Take(10)
-                                  .Select(m => new DisplayMessage(m.Subject, m.ReceivedDateTime, m.From))
-                                  .ExecuteAsync();
-
-                return View(mailResults.CurrentPage);
-            } catch (AdalException ex) {
-                return Content(string.Format("ERROR retrieving messages: {0}", ex.Message));
+                try {
+                    var client = await outlookAccess.GetOutlookClient(outlookToken);
+                    var mailResults = await client.Me.Messages
+                                                  .OrderByDescending(m => m.ReceivedDateTime)
+                                                  .Take(4)
+                                                  .Select(m => new DisplayMessage(m.Subject, m.ReceivedDateTime, m.From))
+                                                  .ExecuteAsync();
+                    var eventResults = await client.Me.Events
+                                                   .OrderByDescending(e => e.Start.DateTime)
+                                                   .Take(4)
+                                                   .Select(e => new DisplayEvent(e.Subject, e.Start.DateTime, e.End.DateTime))
+                                                   .ExecuteAsync();
+                    outlookTokenViewModel.Messages = mailResults.CurrentPage;
+                    outlookTokenViewModel.Events = eventResults.CurrentPage;
+                    list.Add(outlookTokenViewModel);
+                } catch (AdalException ex) {
+                    return Content(string.Format("ERROR retrieving messages: {0}", ex.Message));
+                }
             }
-        }
-
-        public async Task<ActionResult> Calendar() {
-            var outlookToken = (OutlookToken) Session["token"];
-            if (outlookToken == null) {
-                // If there's no token in the session, redirect to Home
-                return Redirect("/");
-            }
-
-            try {
-                var client = await outlookAccess.GetOutlookClient(outlookToken);
-                var eventResults = await client.Me.Events
-                                    .OrderByDescending(e => e.Start.DateTime)
-                                    .Take(10)
-                                    .Select(e => new DisplayEvent(e.Subject, e.Start.DateTime, e.End.DateTime))
-                                    .ExecuteAsync();
-
-                return View(eventResults.CurrentPage);
-            } catch (AdalException ex) {
-                return Content(string.Format("ERROR retrieving events: {0}", ex.Message));
-            }
+            return View(list);
         }
 
 
