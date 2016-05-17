@@ -12,7 +12,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         string clientId = System.Configuration.ConfigurationManager.AppSettings["ida:ClientID"];
         string clientSecret = System.Configuration.ConfigurationManager.AppSettings["ida:ClientSecret"];
         string outlookApiEndpoint = "https://outlook.office.com/api/v2.0";
-        private static string[] scopes = { "openid", "https://outlook.office.com/mail.read",
+        private static string[] scopes = { "https://outlook.office.com/mail.read",
                                    "https://outlook.office.com/calendars.read" };
         /// <summary>
         /// Get a url string to sign in microsoft account.
