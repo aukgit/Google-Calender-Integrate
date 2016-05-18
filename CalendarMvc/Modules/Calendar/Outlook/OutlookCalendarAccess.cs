@@ -11,8 +11,9 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         readonly string _clientId = System.Configuration.ConfigurationManager.AppSettings["ida:ClientID"];
         readonly string _clientSecret = System.Configuration.ConfigurationManager.AppSettings["ida:ClientSecret"];
         readonly string _outlookApiEndpoint = "https://outlook.office.com/api/v2.0";
-        private static readonly string[] Scopes = { "email", "profile", "https://outlook.office.com/contacts.read", "https://outlook.office.com/mail.read",
-                                        "https://outlook.office.com/calendars.read" };
+        private static readonly string[] Scopes = { "https://outlook.office.com/contacts.read",
+                                                    "https://outlook.office.com/mail.read",
+                                                    "https://outlook.office.com/calendars.read" };
         /// <summary>
         /// Get a url string to sign in Microsoft account.
         /// </summary>
@@ -72,29 +73,34 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                     authCode, onSuccessRedirectUri, credential, Scopes);
                 var outlookToken = new OutlookToken();
                 // Save the token in the session
-                outlookToken.Token = authCode;
+                string token = "";
 
+             
+                outlookToken.IsRefreshTokenExpired = false;
                 // Try to get user info
-                outlookToken.Email = GetUserEmail(authContext, _clientId);
+                outlookToken.Email = GetUserEmail(authContext, _clientId, out token);
+                outlookToken.Token = authResult.Token;
+                outlookToken.RefreshToken = token;
                 return outlookToken;
             } catch (Exception ex) {
                 throw ex;
             }
-            return null;
         }
 
-        private string GetUserEmail(AuthenticationContext context, string clientId) {
+        private string GetUserEmail(AuthenticationContext context, string clientId, out string token) {
             // ADAL caches the ID token in its token cache by the client ID
             foreach (TokenCacheItem item in context.TokenCache.ReadItems()) {
                 if (item.Scope.Contains(clientId)) {
+                    token = item.Token;
                     return GetEmailFromIdToken(item.Token);
                 }
             }
+            token = "";
             return string.Empty;
         }
 
 
- 
+
         private string GetEmailFromIdToken(string token) {
             // JWT is made of three parts, separated by a '.' 
             // First part is the header 

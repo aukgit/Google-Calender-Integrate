@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -33,18 +34,29 @@ namespace CalendarMvc.Controllers {
             var redirectUri = new Uri(Url.Action("Authorize", "Home", null, Request.Url.Scheme));
             var outlookToken = await outlookAccess.GetAccessToken(authCode, redirectUri);
             if (outlookToken != null) {
-                if (!db.OutlookTokens.Any(n => n.Token == outlookToken.Token)) {
-                    db.OutlookTokens.Add(outlookToken);
-                    db.SaveChanges();
-                }
+                AddTokenToDatabase(outlookToken);
                 return RedirectToAction("Index");
             }
             return HttpNotFound();
         }
 
+
+        private async void AddTokenToDatabase(OutlookToken outlookToken) {
+            if (outlookToken != null) {
+                var dbToken = db.OutlookTokens.FirstOrDefault(n => n.Email == outlookToken.Email);
+                if (dbToken != null) {
+                    dbToken.Token = outlookToken.Token;
+                    dbToken.RefreshToken = outlookToken.RefreshToken;
+                    dbToken.IsRefreshTokenExpired = outlookToken.IsRefreshTokenExpired;
+                } else {
+                    db.OutlookTokens.Add(outlookToken);
+                }
+                db.SaveChanges();
+            }
+        }
         public async Task<ActionResult> Inbox() {
             var outlookTokens = db.OutlookTokens
-                                  //.Select(n => new OutlookTokenViewModel {Token = n.Token, Email = n.Email, OutlookTokenID = n.OutlookTokenID})
+                //.Select(n => new OutlookTokenViewModel {Token = n.Token, Email = n.Email, OutlookTokenID = n.OutlookTokenID})
                                   .ToList();
             if (outlookTokens.Count == 0) {
                 // If there's no token in the session, redirect to Home
@@ -53,6 +65,7 @@ namespace CalendarMvc.Controllers {
             var list = new List<OutlookTokenViewModel>(outlookTokens.Count + 2);
 
             foreach (var outlookToken in outlookTokens) {
+
                 var outlookTokenViewModel = outlookToken.Cast<OutlookToken, OutlookTokenViewModel>();
 
                 try {
@@ -88,6 +101,10 @@ namespace CalendarMvc.Controllers {
             ViewBag.Message = "Your contact page.";
 
             return View();
+        }
+
+        ~HomeController() {
+            db.Dispose();
         }
     }
 }
