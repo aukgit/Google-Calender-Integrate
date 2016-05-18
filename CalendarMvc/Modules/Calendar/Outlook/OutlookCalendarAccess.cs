@@ -7,24 +7,23 @@ using Microsoft.Office365.OutlookServices;
 
 namespace CalendarMvc.Modules.Calendar.Outlook {
     public class OutlookCalendarAccess {
-
-        string authority = "https://login.microsoftonline.com/common";
-        string clientId = System.Configuration.ConfigurationManager.AppSettings["ida:ClientID"];
-        string clientSecret = System.Configuration.ConfigurationManager.AppSettings["ida:ClientSecret"];
-        string outlookApiEndpoint = "https://outlook.office.com/api/v2.0";
-        private static string[] scopes = { "email", "offline_access","profile", "https://outlook.office.com/mail.read",
-                                   "https://outlook.office.com/calendars.read" };
+        readonly string _authority = "https://login.microsoftonline.com/common";
+        readonly string _clientId = System.Configuration.ConfigurationManager.AppSettings["ida:ClientID"];
+        readonly string _clientSecret = System.Configuration.ConfigurationManager.AppSettings["ida:ClientSecret"];
+        readonly string _outlookApiEndpoint = "https://outlook.office.com/api/v2.0";
+        private static readonly string[] Scopes = { "email", "profile", "https://outlook.office.com/contacts.read", "https://outlook.office.com/mail.read",
+                                        "https://outlook.office.com/calendars.read" };
         /// <summary>
-        /// Get a url string to sign in microsoft account.
+        /// Get a url string to sign in Microsoft account.
         /// </summary>
         /// <param name="onSuccessRedirectUri"></param>
         /// <param name="additionalScopes"></param>
         /// <returns></returns>
         public async Task<string> GetMicrosoftSignInUrl(Uri onSuccessRedirectUri, string[] additionalScopes = null) {
-            AuthenticationContext authContext = new AuthenticationContext(authority);
+            AuthenticationContext authContext = new AuthenticationContext(_authority);
 
             // Generate the parameterized URL for Azure signin
-            Uri authUri = await authContext.GetAuthorizationRequestUrlAsync(scopes, additionalScopes, clientId,
+            Uri authUri = await authContext.GetAuthorizationRequestUrlAsync(Scopes, additionalScopes, _clientId,
                 onSuccessRedirectUri, UserIdentifier.AnyUser, null);
 
             // Redirect the browser to the Azure signin page
@@ -32,7 +31,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         }
 
         public async Task<OutlookServicesClient> GetOutlookClient(OutlookToken outlookToken) {
-            var client = new OutlookServicesClient(new Uri(outlookApiEndpoint),
+            var client = new OutlookServicesClient(new Uri(_outlookApiEndpoint),
                async () => {
                    // Since we have it locally from the Session, just return it here.
                    return outlookToken.Token;
@@ -46,11 +45,11 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             e.RequestMessage.SetHeader("X-AnchorMailbox", email);
         }
         public ClientCredential GetCredentials() {
-            return new ClientCredential(clientId, clientSecret);
+            return new ClientCredential(_clientId, _clientSecret);
         }
 
         public AuthenticationContext GetAuthenticationContext() {
-            return new AuthenticationContext(authority);
+            return new AuthenticationContext(_authority);
         }
 
         /// <summary>
@@ -70,13 +69,13 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             try {
                 // Get the token
                 var authResult = await authContext.AcquireTokenByAuthorizationCodeAsync(
-                    authCode, onSuccessRedirectUri, credential, scopes);
+                    authCode, onSuccessRedirectUri, credential, Scopes);
                 var outlookToken = new OutlookToken();
                 // Save the token in the session
-                outlookToken.Token = authResult.Token;
+                outlookToken.Token = authCode;
 
                 // Try to get user info
-                outlookToken.Email = GetUserEmail(authContext, clientId);
+                outlookToken.Email = GetUserEmail(authContext, _clientId);
                 return outlookToken;
             } catch (Exception ex) {
                 throw ex;
@@ -94,6 +93,8 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             return string.Empty;
         }
 
+
+ 
         private string GetEmailFromIdToken(string token) {
             // JWT is made of three parts, separated by a '.' 
             // First part is the header 
