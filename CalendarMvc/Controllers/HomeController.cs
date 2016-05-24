@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Printing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -15,7 +14,8 @@ namespace CalendarMvc.Controllers {
         private readonly ApplicationDbContext db = new ApplicationDbContext();
         private readonly OutlookCalendarAccess outlookAccess = new OutlookCalendarAccess();
         // followed from https://dev.outlook.com/restapi/tutorial/dotnet
-
+        // https://dev.outlook.com/restapi
+        //http://www.matvelloso.com/2015/01/30/troubleshooting-common-azure-active-directory-errors/
         public ActionResult Index() {
             return View();
         }
@@ -31,7 +31,7 @@ namespace CalendarMvc.Controllers {
         public async Task<ActionResult> Authorize() {
             // Get the 'code' parameter from the Azure redirect
             var authCode = Request.Params["code"];
-            var redirectUri = new Uri(Url.Action("Authorize", "Home", null, Request.Url.Scheme));
+            var redirectUri = new Uri(Url.Action("Authorize", "Home", null, Request.Url.Scheme) );
             var outlookToken = await outlookAccess.GetAccessToken(authCode, redirectUri);
             if (outlookToken != null) {
                 AddTokenToDatabase(outlookToken);
@@ -39,7 +39,6 @@ namespace CalendarMvc.Controllers {
             }
             return HttpNotFound();
         }
-
 
         private async void AddTokenToDatabase(OutlookToken outlookToken) {
             if (outlookToken != null) {
@@ -54,6 +53,7 @@ namespace CalendarMvc.Controllers {
                 db.SaveChanges();
             }
         }
+
         public async Task<ActionResult> Inbox() {
             var outlookTokens = db.OutlookTokens
                 //.Select(n => new OutlookTokenViewModel {Token = n.Token, Email = n.Email, OutlookTokenID = n.OutlookTokenID})
@@ -65,7 +65,6 @@ namespace CalendarMvc.Controllers {
             var list = new List<OutlookTokenViewModel>(outlookTokens.Count + 2);
 
             foreach (var outlookToken in outlookTokens) {
-
                 var outlookTokenViewModel = outlookToken.Cast<OutlookToken, OutlookTokenViewModel>();
 
                 try {
@@ -84,12 +83,11 @@ namespace CalendarMvc.Controllers {
                     outlookTokenViewModel.Events = eventResults.CurrentPage;
                     list.Add(outlookTokenViewModel);
                 } catch (AdalException ex) {
-                    return Content(string.Format("ERROR retrieving messages: {0}", ex.Message));
+                   // return Content(string.Format("ERROR retrieving messages: {0}", ex.Message));
                 }
             }
             return View(list);
         }
-
 
         public ActionResult About() {
             ViewBag.Message = "Your application description page.";

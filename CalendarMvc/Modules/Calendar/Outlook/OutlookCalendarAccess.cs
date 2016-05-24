@@ -1,17 +1,23 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Net.Http;
+using System.Security.Policy;
 using System.Threading.Tasks;
 using CalendarMvc.Models;
 using Microsoft.Experimental.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Office365.OutlookServices;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace CalendarMvc.Modules.Calendar.Outlook {
     public class OutlookCalendarAccess {
-        readonly string _authority = "https://login.microsoftonline.com/common";
+        readonly string _authorityUrl = "https://login.microsoftonline.com/common";
         readonly string _clientId = System.Configuration.ConfigurationManager.AppSettings["ida:ClientID"];
         readonly string _clientSecret = System.Configuration.ConfigurationManager.AppSettings["ida:ClientSecret"];
         readonly string _outlookApiEndpoint = "https://outlook.office.com/api/v2.0";
-        private static readonly string[] Scopes = { "https://outlook.office.com/contacts.read",
+        private static readonly string[] Scopes = { "profile",
+                                                    "https://outlook.office.com/contacts.read",
                                                     "https://outlook.office.com/mail.read",
                                                     "https://outlook.office.com/calendars.read" };
         /// <summary>
@@ -21,7 +27,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         /// <param name="additionalScopes"></param>
         /// <returns></returns>
         public async Task<string> GetMicrosoftSignInUrl(Uri onSuccessRedirectUri, string[] additionalScopes = null) {
-            AuthenticationContext authContext = new AuthenticationContext(_authority);
+            AuthenticationContext authContext = new AuthenticationContext(_authorityUrl);
 
             // Generate the parameterized URL for Azure signin
             Uri authUri = await authContext.GetAuthorizationRequestUrlAsync(Scopes, additionalScopes, _clientId,
@@ -50,7 +56,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         }
 
         public AuthenticationContext GetAuthenticationContext() {
-            return new AuthenticationContext(_authority);
+            return new AuthenticationContext(_authorityUrl);
         }
 
         /// <summary>
@@ -75,16 +81,35 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                 // Save the token in the session
                 string token = "";
 
-             
+
                 outlookToken.IsRefreshTokenExpired = false;
                 // Try to get user info
                 outlookToken.Email = GetUserEmail(authContext, _clientId, out token);
-                outlookToken.Token = authResult.Token;
-                outlookToken.RefreshToken = token;
+                outlookToken.Token = token;
+                outlookToken.RefreshToken = await GetRefreshRoken(authCode, onSuccessRedirectUri);
                 return outlookToken;
             } catch (Exception ex) {
                 throw ex;
             }
+        }
+        private async Task<string> GetRefreshRoken(string authCode, Uri onSuccessRedirectUri) {
+            return await GetRefreshRoken(authCode, onSuccessRedirectUri.AbsoluteUri);
+        }
+        private async Task<string> GetRefreshRoken(string authCode, string onSuccessRedirectUri) {
+            var client = new HttpClient();
+            var parameters = new Dictionary<string, string>
+           {
+              {"client_id", _clientId},
+              {"client_secret", _clientSecret},
+              {"code", authCode },
+              {"redirect_uri",  onSuccessRedirectUri},
+              {"grant_type","authorization_code" }
+           };
+            var content = new FormUrlEncodedContent(parameters);
+            var response = await client.PostAsync(_authorityUrl + "/oauth2/v2.0/token", content);
+            var tokensJsonString = await response.Content.ReadAsStringAsync();
+            dynamic token = Newtonsoft.Json.JsonConvert.DeserializeObject(tokensJsonString);
+            return token.refresh_token;
         }
 
         private string GetUserEmail(AuthenticationContext context, string clientId, out string token) {
