@@ -5,6 +5,15 @@ VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalendarMvc", "CalendarMvc\CalendarMvc.csproj", "{4B1BA1DC-3230-48A1-B637-4DB3279A3E25}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PasswordEncrypt", "PasswordEncrypt\PasswordEncrypt.csproj", "{ECF14BF9-E982-4442-A26D-C434F8DA5D52}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C60034CE-C71A-4342-8FD2-42B40F54FEAF}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +24,10 @@ Global
 		{4B1BA1DC-3230-48A1-B637-4DB3279A3E25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B1BA1DC-3230-48A1-B637-4DB3279A3E25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B1BA1DC-3230-48A1-B637-4DB3279A3E25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECF14BF9-E982-4442-A26D-C434F8DA5D52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECF14BF9-E982-4442-A26D-C434F8DA5D52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECF14BF9-E982-4442-A26D-C434F8DA5D52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECF14BF9-E982-4442-A26D-C434F8DA5D52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
