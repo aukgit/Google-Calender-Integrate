@@ -248,6 +248,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Start\App.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\IdentityConfig.cs" />
@@ -255,6 +256,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\EwsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\OutlookTokensController.cs" />
@@ -264,6 +266,7 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ViewModel\AccountViewModels.cs" />
+    <Compile Include="Models\ViewModel\AppointmentViewModel.cs" />
     <Compile Include="Models\ViewModel\DisplayEvent.cs" />
     <Compile Include="Models\ViewModel\DisplayMessage.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -282,8 +285,54 @@
     <Content Include="App_Data\aspnet-CalenderMvc-20160421040947_log.ldf">
       <DependentUpon>aspnet-CalenderMvc-20160421040947.mdf</DependentUpon>
     </Content>
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\css\bootstrap-datetimepicker.css" />
+    <Content Include="Content\css\bootstrap-datetimepicker.min.css">
+      <DependentUpon>bootstrap-datetimepicker.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\header.css" />
+    <Content Include="Content\css\header.min.css">
+      <DependentUpon>header.css</DependentUpon>
+    </Content>
+    <Content Include="Content\fonts\fontawesome-webfont.svg" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\css\animate-refresh.css" />
+    <Content Include="Content\css\animate-refresh.min.css">
+      <DependentUpon>animate-refresh.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\bootstrap.css" />
+    <Content Include="Content\css\bootstrap.min.css" />
+    <Content Include="Content\css\editor-templates.css" />
+    <Content Include="Content\css\editor-templates.min.css">
+      <DependentUpon>editor-templates.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\editor-templates.variables.css" />
+    <Content Include="Content\css\editor-templates.variables.min.css">
+      <DependentUpon>editor-templates.variables.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\font-awesome.css" />
+    <Content Include="Content\css\font-awesome.min.css">
+      <DependentUpon>font-awesome.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\fonts-rimixens.css" />
+    <Content Include="Content\css\fonts-rimixens.min.css">
+      <DependentUpon>fonts-rimixens.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\less-imports.css" />
+    <Content Include="Content\css\less-imports.min.css">
+      <DependentUpon>less-imports.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\override-mvc.css" />
+    <Content Include="Content\css\override-mvc.min.css">
+      <DependentUpon>override-mvc.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\override-mvc.variables.css" />
+    <Content Include="Content\css\override-mvc.variables.min.css">
+      <DependentUpon>override-mvc.variables.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\utilities.css" />
+    <Content Include="Content\css\utilities.min.css">
+      <DependentUpon>utilities.css</DependentUpon>
+    </Content>
     <Content Include="Content\Font-Awesome\css\font-awesome.min.css" />
     <Content Include="Content\Font-Awesome\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\kendo\default\editor.png" />
@@ -334,19 +383,107 @@
     <Content Include="Content\kendo\textures\stripe6.png" />
     <Content Include="Content\kendo\textures\transparency.png" />
     <Content Include="Content\kendo\textures\transtexture.png" />
-    <Content Include="Content\Site.css">
+    <Content Include="Content\css\Site.css">
       <DependentUpon>Site.less</DependentUpon>
     </Content>
-    <Content Include="Content\Site.min.css">
+    <Content Include="Content\css\Site.min.css">
       <DependentUpon>Site.css</DependentUpon>
     </Content>
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="Content\Site.css.map">
+    <Content Include="Content\css\Site.css.map">
       <DependentUpon>Site.css</DependentUpon>
     </Content>
-    <None Include="Content\Site.less" />
+    <Content Include="Content\less\animate-refresh.less" />
+    <Content Include="Content\less\animate.less" />
+    <Content Include="Content\less\bootstrap-datetimepicker.less" />
+    <Content Include="Content\less\color-fonts.less" />
+    <Content Include="Content\less\editor-templates.less" />
+    <Content Include="Content\less\editor-templates.variables.less" />
+    <Content Include="Content\less\font-awesome.less" />
+    <Content Include="Content\less\font-awesome\animated.less" />
+    <Content Include="Content\less\font-awesome\bordered-pulled.less" />
+    <Content Include="Content\less\font-awesome\core.less" />
+    <Content Include="Content\less\font-awesome\fixed-width.less" />
+    <Content Include="Content\less\font-awesome\icons.less" />
+    <Content Include="Content\less\font-awesome\larger.less" />
+    <Content Include="Content\less\font-awesome\list.less" />
+    <Content Include="Content\less\font-awesome\mixins.less" />
+    <Content Include="Content\less\font-awesome\path.less" />
+    <Content Include="Content\less\font-awesome\rotated-flipped.less" />
+    <Content Include="Content\less\font-awesome\screen-reader.less" />
+    <Content Include="Content\less\font-awesome\stacked.less" />
+    <Content Include="Content\less\font-awesome\variables.less" />
+    <Content Include="Content\less\fonts-rimixens.less" />
+    <Content Include="Content\less\header.less" />
+    <Content Include="Content\less\less-imports.less" />
+    <Content Include="Content\less\override-mvc.less" />
+    <Content Include="Content\less\override-mvc.variables.less" />
+    <Content Include="Content\less\remixens\additional-less-functions.less" />
+    <Content Include="Content\less\remixens\condition.less" />
+    <Content Include="Content\less\remixens\elements.less" />
+    <Content Include="Content\less\remixens\extra-remixens.less" />
+    <Content Include="Content\less\remixens\global.less" />
+    <Content Include="Content\less\remixens\lesshat.less" />
+    <Content Include="Content\less\remixens\loop.less" />
+    <Content Include="Content\less\remixens\responsive\responsive-centering.less" />
+    <Content Include="Content\less\remixens\responsive\responsive-placements.less" />
+    <Content Include="Content\less\remixens\responsive\responsive-width.less" />
+    <Content Include="Content\less\remixens\variables.less" />
+    <Content Include="Content\less\utilities.less" />
+    <Content Include="Content\less\utilities\add-on.less" />
+    <Content Include="Content\less\utilities\alignments-center-float-margin.less" />
+    <Content Include="Content\less\utilities\border-radius.less" />
+    <Content Include="Content\less\utilities\display.less" />
+    <Content Include="Content\less\utilities\fonts.less" />
+    <Content Include="Content\less\utilities\gaps.less" />
+    <Content Include="Content\less\utilities\indenting.less" />
+    <Content Include="Content\less\utilities\input-with-others.less" />
+    <Content Include="Content\less\utilities\margin.less" />
+    <Content Include="Content\less\utilities\opacity.less" />
+    <Content Include="Content\less\utilities\padding.less" />
+    <Content Include="Content\css\editor-templates.css.map">
+      <DependentUpon>editor-templates.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\animate-refresh.css.map">
+      <DependentUpon>animate-refresh.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\editor-templates.variables.css.map">
+      <DependentUpon>editor-templates.variables.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\font-awesome.css.map">
+      <DependentUpon>font-awesome.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\fonts-rimixens.css.map">
+      <DependentUpon>fonts-rimixens.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\less-imports.css.map">
+      <DependentUpon>less-imports.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\override-mvc.css.map">
+      <DependentUpon>override-mvc.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\override-mvc.variables.css.map">
+      <DependentUpon>override-mvc.variables.css</DependentUpon>
+    </Content>
+    <Content Include="Content\fonts\fontawesome-webfont.eot" />
+    <Content Include="Content\fonts\fontawesome-webfont.ttf" />
+    <Content Include="Content\fonts\fontawesome-webfont.woff" />
+    <Content Include="Content\fonts\fontawesome-webfont.woff2" />
+    <Content Include="Content\fonts\FontAwesome.otf" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="Content\css\header.css.map">
+      <DependentUpon>header.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\bootstrap-datetimepicker.css.map">
+      <DependentUpon>bootstrap-datetimepicker.css</DependentUpon>
+    </Content>
+    <None Include="Content\css\Site.less" />
+    <Content Include="Scripts\bootstrap-datetimepicker.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Content\Font-Awesome\fonts\fontawesome-webfont.eot" />
@@ -355,20 +492,26 @@
     <Content Include="Content\Font-Awesome\fonts\fontawesome-webfont.woff2" />
     <Content Include="Content\Font-Awesome\fonts\FontAwesome.otf" />
     <Content Include="App_Data\client_secret2.json" />
-    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\custom.js" />
-    <Content Include="Scripts\jquery-1.10.2.js" />
-    <Content Include="Scripts\jquery-1.10.2.min.js" />
+    <Content Include="Content\css\utilities.css.map">
+      <DependentUpon>utilities.css</DependentUpon>
+    </Content>
+    <Content Include="Content\less\header.variables.less" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <None Include="Scripts\jQuery\jquery-2.2.3.intellisense.js" />
+    <Content Include="Scripts\jQueryExtend.fn.js" />
+    <Content Include="Scripts\jQueryExtend.js" />
+    <Content Include="Scripts\jQuery\jquery-2.2.3.js" />
     <Content Include="Scripts\kendo.all.min.js" />
     <Content Include="Scripts\kendo.timezones.min.js" />
     <Content Include="Scripts\KendoUI\kendo.all.min.js" />
     <Content Include="Scripts\KendoUI\kendo.custom.min.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
@@ -386,7 +529,6 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Scripts\jquery-1.10.2.min.map" />
     <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
     <Content Include="Views\Account\ConfirmEmail.cshtml" />
     <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
@@ -416,8 +558,19 @@
     <Content Include="Views\OutlookTokens\Details.cshtml" />
     <Content Include="Views\OutlookTokens\Edit.cshtml" />
     <Content Include="Views\OutlookTokens\Index.cshtml" />
+    <Content Include="Views\Ews\Index.cshtml" />
+    <Content Include="Views\Ews\Create.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\AnyTypeIcon.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Date.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\DateTime.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Int.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Long.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\String.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\TextArea.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="bin\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />

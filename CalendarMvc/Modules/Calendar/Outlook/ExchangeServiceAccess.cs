@@ -9,6 +9,8 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         private readonly string _password;
         private ExchangeService _service;
 
+        private bool _isServiceCredentialsAreSet;
+
         /// <summary>
         /// Default version : ExchangeVersion.Exchange2013_SP1
         /// </summary>
@@ -32,8 +34,11 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         }
 
         public ExchangeService GetConnectedExchangeService() {
-            SetNetworkCredentialsInService();
-            RetriveAutoDiscoverableUri();
+            if (!_isServiceCredentialsAreSet) {
+                SetNetworkCredentialsInService();
+                RetriveAutoDiscoverableUri();
+                _isServiceCredentialsAreSet = true;
+            }
             return _service;
         }
 
@@ -220,5 +225,39 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             }
             return rtList;
         }
+
+        public Appointment WriteEventInCalendar(
+            string title,
+            string body,
+            DateTime start,
+            DateTime end,
+            string location = "",
+            DateTime? reminderDueDate = null,
+            int remindBeforeMins = 60,
+            string[] attendees = null) {
+            Appointment meeting = new Appointment(_service);
+
+            // Set the properties on the meeting object to create the meeting.
+            meeting.Subject = title;
+            meeting.Body = body;
+            meeting.Start = start;
+            meeting.End = end;
+            meeting.Location = location;
+            if (attendees != null) {
+                foreach (var attendee in attendees) {
+                    meeting.RequiredAttendees.Add(attendee);
+                }
+            }
+            if (reminderDueDate.HasValue) {
+                meeting.ReminderDueBy = reminderDueDate.Value;
+            }
+            meeting.ReminderMinutesBeforeStart = remindBeforeMins;
+
+            // Save the meeting to the Calendar folder and send the meeting request.
+            meeting.Save(SendInvitationsMode.SendToAllAndSaveCopy);
+
+            return meeting;
+        }
     }
+
 }

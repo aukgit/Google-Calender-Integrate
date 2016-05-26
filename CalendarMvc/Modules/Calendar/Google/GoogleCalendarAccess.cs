@@ -16,8 +16,6 @@ namespace CalendarMvc.Modules.Calendar.Google {
         private string ApplicationName = "Google Calendar API .NET Quickstart";
         private ClientSecrets _secrects;
         private UserCredential _credentials;
-
-
         
         private ClientSecrets GetClientSerects() {
             if (_secrects == null) {

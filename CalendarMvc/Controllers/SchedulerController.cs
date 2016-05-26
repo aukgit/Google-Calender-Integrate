@@ -6,8 +6,7 @@ namespace CalendarMvc.Controllers {
         private static string[] scopes = { "https://outlook.office.com/mail.read" };
 
 
-        [HttpPost]
-        public ActionResult Index(string userEmailAdress) {
+        public ActionResult Index() {
 
             return View("ListEvents");
         }
