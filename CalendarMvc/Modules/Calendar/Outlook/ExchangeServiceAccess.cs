@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Microsoft.Exchange.WebServices.Data;
 
@@ -22,6 +23,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             _email = email;
             _password = password;
             _service = new ExchangeService(version);
+            GetConnectedExchangeService();
         }
 
         private void SetNetworkCredentialsInService() {
@@ -72,7 +74,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         /// and single occurrence calendar items by using the FindItem operation.
         /// </summary>
         /// <param name="queryFilter">Give search string</param>
-        private FindItemsResults<Item> GetCalendarItems(int possibleItems = 100, string queryFilter = null) {
+        public FindItemsResults<Item> GetCalendarItems(int possibleItems = 100, string queryFilter = null) {
             // Specify a view that returns up to five recurring master items.
             ItemView view = new ItemView(possibleItems);
 
@@ -94,8 +96,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
-        /// <param name="queryFilter"></param>
-        private FindItemsResults<Item> GetCalendarItems(DateTime start, DateTime end) {
+        public List<OutlookAppointment> GetCalendarItems(DateTime start, DateTime end) {
             // Specify a view that returns up to five recurring master items.
             // Specify a calendar view for returning instances of a recurring series.
             CalendarView calView = new CalendarView(start, end);
@@ -105,19 +106,43 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                 // This results in a FindItem call to EWS. This will return the occurrences and exceptions
                 // to a recurring series and will return appointments that are not part of a recurring series. This will not return 
                 // recurring master items. Note that a search restriction or querystring cannot be used with a CalendarView.
-                return _service.FindItems(WellKnownFolderName.Calendar, calView);
+                //ExtendedPropertyDefinition PidTagSenderSmtpAddress = new ExtendedPropertyDefinition(0x5D01, MapiPropertyType.Binary);
+                ////PropertySet psPropset = new PropertySet(BasePropertySet.FirstClassProperties);
+                //psPropset.Add(PidTagSenderSmtpAddress);
+                //calView.PropertySet = psPropset;
+                //calView.Traversal = ItemTraversal.Associated;
+
+                PropertySet itmPropSet = new PropertySet(BasePropertySet.FirstClassProperties);
+                itmPropSet.RequestedBodyType = BodyType.Text;
+
+                var appointments = _service.FindAppointments(WellKnownFolderName.Calendar, calView);
+
+                _service.LoadPropertiesForItems(from Item item in appointments select item, itmPropSet);
+
+                var list = new List<OutlookAppointment>(appointments.TotalCount + 2);
+                object email = null;
+                foreach (var appointment in appointments) {
+                    var outlookAppointment = new OutlookAppointment();
+                    outlookAppointment.Email = appointment.Organizer.Address;
+                    outlookAppointment.Recipients = appointment.RequiredAttendees;
+                    outlookAppointment.Subject = appointment.Subject;
+                    outlookAppointment.Body = appointment.Body.ToString();
+                    outlookAppointment.Meeting = appointment;
+                    list.Add(outlookAppointment);
+                }
+                return list;
             } catch (Exception ex) {
                 Console.WriteLine("Error: " + ex.Message);
             }
             return null;
         }
-        static Dictionary<string, Folder> GetCalendarFolders(ExchangeService service, String searchIn = "My Calendars") {
+        public Dictionary<string, Folder> GetCalendarFolders(string searchIn = "My Calendars") {
             Dictionary<String, Folder> rtList = new Dictionary<string, Folder>();
 
             FolderId rfRootFolderid = new FolderId(WellKnownFolderName.Root);//, mbMailboxname
             FolderView fvFolderView = new FolderView(1000);
             SearchFilter sfSearchFilter = new SearchFilter.IsEqualTo(FolderSchema.DisplayName, "Common Views");
-            FindFoldersResults ffoldres = service.FindFolders(rfRootFolderid, sfSearchFilter, fvFolderView);
+            FindFoldersResults ffoldres = _service.FindFolders(rfRootFolderid, sfSearchFilter, fvFolderView);
             if (ffoldres.Folders.Count == 1) {
 
                 PropertySet psPropset = new PropertySet(BasePropertySet.FirstClassProperties);
@@ -149,11 +174,11 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                                     ssArraynum = 1;
                                 }
                             }
-                            NameResolutionCollection ncCol = service.ResolveName(lnLegDN, ResolveNameSearchLocation.DirectoryOnly, true);
+                            NameResolutionCollection ncCol = _service.ResolveName(lnLegDN, ResolveNameSearchLocation.DirectoryOnly, true);
                             if (ncCol.Count > 0) {
 
                                 FolderId SharedCalendarId = new FolderId(WellKnownFolderName.Calendar, ncCol[0].Mailbox.Address);
-                                Folder SharedCalendaFolder = Folder.Bind(service, SharedCalendarId);
+                                Folder SharedCalendaFolder = Folder.Bind(_service, SharedCalendarId);
                                 rtList.Add(ncCol[0].Mailbox.Address, SharedCalendaFolder);
 
 
@@ -168,13 +193,13 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             }
             return rtList;
         }
-        static Dictionary<string, Folder> GetSharedCalendarFolders(ExchangeService service, String searchIn = "My Calendars") {
-            Dictionary<String, Folder> rtList = new Dictionary<string, Folder>();
+        public List<OutlookFolder> GetSharedCalendarFolders(String searchIn = "My Calendars") {
+            var list = new List<OutlookFolder>(25);
 
             FolderId rfRootFolderid = new FolderId(WellKnownFolderName.Root);//, mbMailboxname
             FolderView fvFolderView = new FolderView(1000);
             SearchFilter sfSearchFilter = new SearchFilter.IsEqualTo(FolderSchema.DisplayName, "Common Views");
-            FindFoldersResults ffoldres = service.FindFolders(rfRootFolderid, sfSearchFilter, fvFolderView);
+            FindFoldersResults ffoldres = _service.FindFolders(rfRootFolderid, sfSearchFilter, fvFolderView);
             if (ffoldres.Folders.Count == 1) {
 
                 PropertySet psPropset = new PropertySet(BasePropertySet.FirstClassProperties);
@@ -206,12 +231,18 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                                     ssArraynum = 1;
                                 }
                             }
-                            NameResolutionCollection ncCol = service.ResolveName(lnLegDN, ResolveNameSearchLocation.DirectoryOnly, true);
+                            NameResolutionCollection ncCol = _service.ResolveName(lnLegDN, ResolveNameSearchLocation.DirectoryOnly, true);
                             if (ncCol.Count > 0) {
-
+                                var outlookFolder = new OutlookFolder();
                                 FolderId SharedCalendarId = new FolderId(WellKnownFolderName.Calendar, ncCol[0].Mailbox.Address);
-                                Folder SharedCalendaFolder = Folder.Bind(service, SharedCalendarId);
-                                rtList.Add(ncCol[0].Mailbox.Address, SharedCalendaFolder);
+                                Folder SharedCalendaFolder = Folder.Bind(_service, SharedCalendarId);
+                                outlookFolder.FolderId = SharedCalendarId;
+                                outlookFolder.Folder = SharedCalendaFolder;
+                                outlookFolder.MailBox = ncCol[0].Mailbox;
+                                outlookFolder.Email = outlookFolder.MailBox.Address;
+                                outlookFolder.DisplayName = outlookFolder.MailBox.Name;
+
+                                list.Add(outlookFolder);
 
 
                             }
@@ -223,7 +254,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
 
                 }
             }
-            return rtList;
+            return list;
         }
 
         public Appointment WriteEventInCalendar(

@@ -38,6 +38,7 @@ namespace CalendarMvc {
                 jsLibraryFolder + "kendo.timezones.min.js",
                 jsLibraryFolder + "jQueryExtend.js",
                 jsLibraryFolder + "jQueryExtend.fn.js",
+                jsLibraryFolder + "detect-browser.js",
                 jsLibraryFolder + "custom.js",
                 jsLibraryFolder + "respond.js"
                 ));
@@ -72,6 +73,7 @@ namespace CalendarMvc {
                     stylesFolder + "front-developer.css",
                     stylesFolder + "footer-fixing.css",
                     stylesFolder + "utilities.css",
+                    stylesFolder + "ie-fix.css",
 
 
                       stylesFolder + "site.css"));

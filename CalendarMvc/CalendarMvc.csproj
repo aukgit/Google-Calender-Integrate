@@ -265,6 +265,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\EventOwner.cs" />
     <Compile Include="Models\ViewModel\AccountViewModels.cs" />
     <Compile Include="Models\ViewModel\AppointmentViewModel.cs" />
     <Compile Include="Models\ViewModel\DisplayEvent.cs" />
@@ -277,6 +278,8 @@
     <Compile Include="Modules\Calendar\Google\GoogleCalendarAccess.cs" />
     <Compile Include="Modules\Calendar\Outlook\ExchangeServiceAccess.cs" />
     <Compile Include="Modules\Calendar\Outlook\OutlookCalendarAccess.cs" />
+    <Compile Include="Modules\Calendar\Outlook\OutlookFolder.cs" />
+    <Compile Include="Modules\Calendar\Outlook\OutlookAppointment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -292,6 +295,10 @@
     <Content Include="Content\css\header.css" />
     <Content Include="Content\css\header.min.css">
       <DependentUpon>header.css</DependentUpon>
+    </Content>
+    <Content Include="Content\css\ie-fix.css" />
+    <Content Include="Content\css\ie-fix.min.css">
+      <DependentUpon>ie-fix.css</DependentUpon>
     </Content>
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
@@ -335,54 +342,54 @@
     </Content>
     <Content Include="Content\Font-Awesome\css\font-awesome.min.css" />
     <Content Include="Content\Font-Awesome\fonts\fontawesome-webfont.svg" />
-    <Content Include="Content\kendo\default\editor.png" />
-    <Content Include="Content\kendo\default\imagebrowser.png" />
-    <Content Include="Content\kendo\default\indeterminate.gif" />
-    <Content Include="Content\kendo\default\loading-image.gif" />
-    <Content Include="Content\kendo\default\loading.gif" />
-    <Content Include="Content\kendo\default\loading_2x.gif" />
-    <Content Include="Content\kendo\default\markers.png" />
-    <Content Include="Content\kendo\default\markers_2x.png" />
-    <Content Include="Content\kendo\default\slider-h.gif" />
-    <Content Include="Content\kendo\default\slider-v.gif" />
-    <Content Include="Content\kendo\default\sprite.png" />
-    <Content Include="Content\kendo\default\sprite_2x.png" />
-    <Content Include="Content\kendo\default\sprite_kpi.png" />
-    <Content Include="Content\kendo\default\sprite_kpi_2x.png" />
-    <Content Include="Content\kendo\kendo.common.css" />
-    <Content Include="Content\kendo\kendo.default.css" />
-    <Content Include="Content\kendo\kendo.material.min.css" />
-    <Content Include="Content\kendo\telerik.metro.black.css" />
-    <Content Include="Content\kendo\textures\brushed-metal.png" />
-    <Content Include="Content\kendo\textures\dots1.png" />
-    <Content Include="Content\kendo\textures\dots10.png" />
-    <Content Include="Content\kendo\textures\dots11.png" />
-    <Content Include="Content\kendo\textures\dots12.png" />
-    <Content Include="Content\kendo\textures\dots13.png" />
-    <Content Include="Content\kendo\textures\dots2.png" />
-    <Content Include="Content\kendo\textures\dots3.png" />
-    <Content Include="Content\kendo\textures\dots4.png" />
-    <Content Include="Content\kendo\textures\dots5.png" />
-    <Content Include="Content\kendo\textures\dots6.png" />
-    <Content Include="Content\kendo\textures\dots7.png" />
-    <Content Include="Content\kendo\textures\dots8.png" />
-    <Content Include="Content\kendo\textures\dots9.png" />
-    <Content Include="Content\kendo\textures\glass-lighter.png" />
-    <Content Include="Content\kendo\textures\glass.png" />
-    <Content Include="Content\kendo\textures\highlight.png" />
-    <Content Include="Content\kendo\textures\hsv-gradient.png" />
-    <Content Include="Content\kendo\textures\hue.png" />
-    <Content Include="Content\kendo\textures\leather1.png" />
-    <Content Include="Content\kendo\textures\leather2.png" />
-    <Content Include="Content\kendo\textures\noise.png" />
-    <Content Include="Content\kendo\textures\stripe1.png" />
-    <Content Include="Content\kendo\textures\stripe2.png" />
-    <Content Include="Content\kendo\textures\stripe3.png" />
-    <Content Include="Content\kendo\textures\stripe4.png" />
-    <Content Include="Content\kendo\textures\stripe5.png" />
-    <Content Include="Content\kendo\textures\stripe6.png" />
-    <Content Include="Content\kendo\textures\transparency.png" />
-    <Content Include="Content\kendo\textures\transtexture.png" />
+    <Content Include="Content\css\kendo\default\editor.png" />
+    <Content Include="Content\css\kendo\default\imagebrowser.png" />
+    <Content Include="Content\css\kendo\default\indeterminate.gif" />
+    <Content Include="Content\css\kendo\default\loading-image.gif" />
+    <Content Include="Content\css\kendo\default\loading.gif" />
+    <Content Include="Content\css\kendo\default\loading_2x.gif" />
+    <Content Include="Content\css\kendo\default\markers.png" />
+    <Content Include="Content\css\kendo\default\markers_2x.png" />
+    <Content Include="Content\css\kendo\default\slider-h.gif" />
+    <Content Include="Content\css\kendo\default\slider-v.gif" />
+    <Content Include="Content\css\kendo\default\sprite.png" />
+    <Content Include="Content\css\kendo\default\sprite_2x.png" />
+    <Content Include="Content\css\kendo\default\sprite_kpi.png" />
+    <Content Include="Content\css\kendo\default\sprite_kpi_2x.png" />
+    <Content Include="Content\css\kendo\kendo.common.css" />
+    <Content Include="Content\css\kendo\kendo.default.css" />
+    <Content Include="Content\css\kendo\kendo.material.min.css" />
+    <Content Include="Content\css\kendo\telerik.metro.black.css" />
+    <Content Include="Content\css\kendo\textures\brushed-metal.png" />
+    <Content Include="Content\css\kendo\textures\dots1.png" />
+    <Content Include="Content\css\kendo\textures\dots10.png" />
+    <Content Include="Content\css\kendo\textures\dots11.png" />
+    <Content Include="Content\css\kendo\textures\dots12.png" />
+    <Content Include="Content\css\kendo\textures\dots13.png" />
+    <Content Include="Content\css\kendo\textures\dots2.png" />
+    <Content Include="Content\css\kendo\textures\dots3.png" />
+    <Content Include="Content\css\kendo\textures\dots4.png" />
+    <Content Include="Content\css\kendo\textures\dots5.png" />
+    <Content Include="Content\css\kendo\textures\dots6.png" />
+    <Content Include="Content\css\kendo\textures\dots7.png" />
+    <Content Include="Content\css\kendo\textures\dots8.png" />
+    <Content Include="Content\css\kendo\textures\dots9.png" />
+    <Content Include="Content\css\kendo\textures\glass-lighter.png" />
+    <Content Include="Content\css\kendo\textures\glass.png" />
+    <Content Include="Content\css\kendo\textures\highlight.png" />
+    <Content Include="Content\css\kendo\textures\hsv-gradient.png" />
+    <Content Include="Content\css\kendo\textures\hue.png" />
+    <Content Include="Content\css\kendo\textures\leather1.png" />
+    <Content Include="Content\css\kendo\textures\leather2.png" />
+    <Content Include="Content\css\kendo\textures\noise.png" />
+    <Content Include="Content\css\kendo\textures\stripe1.png" />
+    <Content Include="Content\css\kendo\textures\stripe2.png" />
+    <Content Include="Content\css\kendo\textures\stripe3.png" />
+    <Content Include="Content\css\kendo\textures\stripe4.png" />
+    <Content Include="Content\css\kendo\textures\stripe5.png" />
+    <Content Include="Content\css\kendo\textures\stripe6.png" />
+    <Content Include="Content\css\kendo\textures\transparency.png" />
+    <Content Include="Content\css\kendo\textures\transtexture.png" />
     <Content Include="Content\css\Site.css">
       <DependentUpon>Site.less</DependentUpon>
     </Content>
@@ -482,6 +489,9 @@
     <Content Include="Content\css\bootstrap-datetimepicker.css.map">
       <DependentUpon>bootstrap-datetimepicker.css</DependentUpon>
     </Content>
+    <Content Include="Content\css\ie-fix.css.map">
+      <DependentUpon>ie-fix.css</DependentUpon>
+    </Content>
     <None Include="Content\css\Site.less" />
     <Content Include="Scripts\bootstrap-datetimepicker.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -497,7 +507,9 @@
       <DependentUpon>utilities.css</DependentUpon>
     </Content>
     <Content Include="Content\less\header.variables.less" />
+    <Content Include="Content\less\ie-fix.less" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\detect-browser.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -567,6 +579,8 @@
     <Content Include="Views\Shared\EditorTemplates\Long.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\String.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\TextArea.cshtml" />
+    <Content Include="Views\Ews\Success.cshtml" />
+    <Content Include="Views\Ews\GetSharedCalendars.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\" />

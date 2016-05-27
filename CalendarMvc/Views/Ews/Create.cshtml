@@ -15,7 +15,6 @@
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
     
         @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "" } })
-        @Html.EditorFor(model => model.Subject, new { htmlAttributes = new { @class = "" } })
         @Html.EditorFor(model => model.Body, "TextArea", new { htmlAttributes = new { @class = "" } })
         @Html.EditorFor(model => model.Start)
         @Html.EditorFor(model => model.End)

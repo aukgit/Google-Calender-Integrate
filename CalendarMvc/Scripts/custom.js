@@ -16,7 +16,7 @@
             batch: true,
             transport: {
                 read: {
-                    url: "//demos.telerik.com/kendo-ui/service/tasks",
+                    url: "//localhost:27592/Scheduler/Read",
                     dataType: "jsonp"
                 },
                 update: {
@@ -110,4 +110,9 @@
         }
     };
     datePickerComponentEnable();
+
+    if ($.detectBrowser.isInternetExplorer) {
+        var $html = $("#html-start");
+        $html.addClass("ie");
+    }
 });

@@ -26,6 +26,7 @@ namespace CalendarMvc.Models
         }
 
         public DbSet<OutlookToken> OutlookTokens { get; set; }
+        public DbSet<EventOwner> EventOwners { get; set; }
         public static ApplicationDbContext Create()
         {
             return new ApplicationDbContext();
