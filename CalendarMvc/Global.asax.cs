@@ -12,7 +12,7 @@ namespace CalendarMvc
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            
+            var serviceStart = App.ExchangeServiceAccess;
             DevMvcComponent.Mvc.Setup(System.Reflection.Assembly.GetExecutingAssembly());
         }
     }

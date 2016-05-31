@@ -26,7 +26,7 @@ $.detectBrowser = {
         /// </summary>
         return $.detectBrowser.browserVersion;
     },
-    isMinimumBrowser: function (chormeVersion,firefoxVersion, IEVersion ,safariVersion,operaVersion) {
+    isMinimumBrowser: function (chormeVersion, firefoxVersion, IEVersion, safariVersion, operaVersion) {
         if ($.detectBrowser.isChrome && $.detectBrowser.browserVersion >= chormeVersion) {
             return true;
         } else if ($.detectBrowser.isFirefox && $.detectBrowser.browserVersion >= firefoxVersion) {
@@ -121,5 +121,8 @@ $.detectBrowser = {
     }
 
 }
-$.detectBrowser.execute();
-$.detectBrowser.printBrowser();
+$(function () {
+    $.detectBrowser.execute();
+
+});
+//$.detectBrowser.printBrowser();

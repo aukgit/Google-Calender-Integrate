@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
+using CalendarMvc.Models.ViewModel;
 using Microsoft.Exchange.WebServices.Data;
 
 namespace CalendarMvc.Modules.Calendar.Outlook {
@@ -77,7 +79,6 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         public FindItemsResults<Item> GetCalendarItems(int possibleItems = 100, string queryFilter = null) {
             // Specify a view that returns up to five recurring master items.
             ItemView view = new ItemView(possibleItems);
-
             // Specify a calendar view for returning instances of a recurring series.
 
             try {
@@ -89,6 +90,33 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                 Console.WriteLine("Error: " + ex.Message);
             }
             return null;
+        }
+
+        /// <summary>
+        /// Finds recurring master calendar items, occurrences and exceptions for recurring calendar items,
+        /// and single occurrence calendar items by using the FindItem operation.
+        /// </summary>
+        /// <param name="queryFilter">Give search string</param>
+        /// <param name="folderId"></param>
+        public FindItemsResults<Item> GetCalendarItems(FolderId folderId, int possibleItems = 100, string queryFilter = null) {
+            // Specify a view that returns up to five recurring master items.
+            ItemView view = new ItemView(possibleItems);
+            // Specify a calendar view for returning instances of a recurring series.
+
+            try {
+                // Find up to the first five recurring master appointments in the calendar with 'Weekly Tennis Lesson' set for the subject property.
+                // This results in a FindItem operation call to EWS. This will return the recurring master
+                // appointment.
+                return _service.FindItems(folderId, queryFilter, view);
+            } catch (Exception ex) {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+            return null;
+        }
+
+        public FolderId GetFolderId(string email) {
+            var mailBox = new Mailbox(email, null);
+            return new FolderId(WellKnownFolderName.Calendar, mailBox);
         }
         /// <summary>
         /// Finds recurring master calendar items, occurrences and exceptions for recurring calendar items,
@@ -164,7 +192,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                         object WlinkAddressBookEID = null;
                         if (itItem.TryGetProperty(PidTagWlinkAddressBookEID, out WlinkAddressBookEID)) {
 
-                            byte[] ssStoreID = (byte[]) WlinkAddressBookEID;
+                            byte[] ssStoreID = (byte[])WlinkAddressBookEID;
                             int leLegDnStart = 0;
                             String lnLegDN = "";
                             for (int ssArraynum = (ssStoreID.Length - 2); ssArraynum != 0; ssArraynum--) {
@@ -221,7 +249,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                         object WlinkAddressBookEID = null;
                         if (itItem.TryGetProperty(PidTagWlinkAddressBookEID, out WlinkAddressBookEID)) {
 
-                            byte[] ssStoreID = (byte[]) WlinkAddressBookEID;
+                            byte[] ssStoreID = (byte[])WlinkAddressBookEID;
                             int leLegDnStart = 0;
                             String lnLegDN = "";
                             for (int ssArraynum = (ssStoreID.Length - 2); ssArraynum != 0; ssArraynum--) {
@@ -265,6 +293,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             string location = "",
             DateTime? reminderDueDate = null,
             int remindBeforeMins = 60,
+            bool isAllDay = false,
             string[] attendees = null) {
             Appointment meeting = new Appointment(_service);
 
@@ -274,11 +303,8 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             meeting.Start = start;
             meeting.End = end;
             meeting.Location = location;
-            if (attendees != null) {
-                foreach (var attendee in attendees) {
-                    meeting.RequiredAttendees.Add(attendee);
-                }
-            }
+            meeting.IsAllDayEvent = isAllDay;
+            AddAttendees(meeting, attendees, true);
             if (reminderDueDate.HasValue) {
                 meeting.ReminderDueBy = reminderDueDate.Value;
             }
@@ -288,6 +314,59 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             meeting.Save(SendInvitationsMode.SendToAllAndSaveCopy);
 
             return meeting;
+        }
+
+        private void AddAttendees(Appointment appointment, string[] attendees = null, bool isNew = false) {
+            if (attendees != null) {
+                if (!isNew) {
+                    appointment.RequiredAttendees.Clear();
+                }
+                foreach (var attendee in attendees) {
+                    appointment.RequiredAttendees.Add(attendee);
+                }
+            }
+        }
+        public KendoSchedulerViewModel UpdateAppointment(KendoSchedulerViewModel m, ItemId id, string[] attendees = null) {
+            //Appointment meeting = new Appointment(_service);
+            Item item = Item.Bind(_service, id, new PropertySet(ItemSchema.Subject));
+            var appointment = (Appointment)item;
+            appointment.Subject = m.Title;
+            appointment.Body = m.Description;
+            appointment.Start = m.Start;
+            appointment.End = m.End;
+            appointment.IsAllDayEvent = m.IsAllDay;
+            AddAttendees(appointment, attendees, false);
+
+            //appointment.title
+            item.Update(ConflictResolutionMode.AlwaysOverwrite);
+            return m;
+            //// Set the properties on the meeting object to create the meeting.
+            //meeting.Subject = title;
+            //meeting.Body = body;
+            //meeting.Start = start;
+            //meeting.End = end;
+            //meeting.Location = location;
+            //meeting.IsAllDayEvent = isAllDay;
+            //if (attendees != null) {
+            //    foreach (var attendee in attendees) {
+            //        meeting.RequiredAttendees.Add(attendee);
+            //    }
+            //}
+            //if (reminderDueDate.HasValue) {
+            //    meeting.ReminderDueBy = reminderDueDate.Value;
+            //}
+            //meeting.ReminderMinutesBeforeStart = remindBeforeMins;
+
+            //// Save the meeting to the Calendar folder and send the meeting request.
+            //meeting.Save(SendInvitationsMode.SendToAllAndSaveCopy);
+
+            //return meeting;
+        }
+
+        public void DestroyAppointment(KendoSchedulerViewModel m, ItemId id) {
+            Item item = Item.Bind(_service, id, new PropertySet(ItemSchema.Subject));
+            var appointment = (Appointment)item;
+            appointment.Delete(DeleteMode.MoveToDeletedItems);
         }
     }
 

@@ -1,0 +1,45 @@
+﻿@model IEnumerable<CalendarMvc.Models.EventOwner>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OwnerName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Color)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Email)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.OwnerName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Color)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.EventOwnerID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.EventOwnerID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.EventOwnerID })
+        </td>
+    </tr>
+}
+
+</table>

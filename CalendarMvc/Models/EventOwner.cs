@@ -8,5 +8,6 @@ namespace CalendarMvc.Models {
         public int EventOwnerID { get; set; }
         public string Email { get; set; }
         public string OwnerName { get; set; }
+        public string Color { get; set; }
     }
 }

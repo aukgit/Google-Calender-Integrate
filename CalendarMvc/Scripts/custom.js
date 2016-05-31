@@ -1,80 +1,113 @@
 ﻿$(function () {
-    $("#scheduler").kendoScheduler({
-        date: new Date("2013/6/13"),
-        startTime: new Date("2013/6/13 07:00 AM"),
-        height: 600,
-        views: [
-            "day",
-            { type: "workWeek", selected: true },
-            "week",
-            "month",
-            "agenda",
-            { type: "timeline", eventHeight: 50 }
-        ],
-        timezone: "Etc/UTC",
-        dataSource: {
-            batch: true,
-            transport: {
-                read: {
-                    url: "//localhost:27592/Scheduler/Read",
-                    dataType: "jsonp"
+    var controller = "/Scheduler/";
+    var initializeScheduler = function (eventOwners) {
+        var $scheduler = $("#scheduler");
+
+        $scheduler.kendoScheduler({
+            height: 600,
+            views: [
+                "day",
+                "workWeek",
+                "week",
+                { type: "month", selected: true },
+                "agenda",
+                { type: "timeline", eventHeight: 50 }
+            ],
+            timezone: "Etc/UTC",
+            dataSource: {
+                batch: true,
+                transport: {
+                    read: {
+                        url: controller + "Read",
+                        dataType: "json"
+                    },
+                    update: {
+                        //url: "//demos.telerik.com/kendo-ui/service/tasks/update",
+                        url: controller + "update",
+                        dataType: "json"
+                    },
+                    create: {
+                        url: controller +  "create",
+                        dataType: "json"
+                    },
+                    destroy: {
+                        url: controller + "destroy",
+                        dataType: "json"
+                    },
+                    parameterMap: function (options, operation) {
+                        if (operation !== "read" && options.models) {
+                            var result = options.models[0];
+                            result.Start = result.Start.toUTCString();
+                            result.End = result.End.toUTCString();
+
+                            return options.models[0];
+                        }
+                    }
                 },
-                update: {
-                    url: "//demos.telerik.com/kendo-ui/service/tasks/update",
-                    dataType: "jsonp"
-                },
-                create: {
-                    url: "//demos.telerik.com/kendo-ui/service/tasks/create",
-                    dataType: "jsonp"
-                },
-                destroy: {
-                    url: "//demos.telerik.com/kendo-ui/service/tasks/destroy",
-                    dataType: "jsonp"
-                },
-                parameterMap: function (options, operation) {
-                    if (operation !== "read" && options.models) {
-                        return { models: kendo.stringify(options.models) };
+                schema: {
+                    model: {
+                        id: "taskId",
+                        fields: {
+                            taskId: { from: "TaskID"},
+                            title: { from: "Title", defaultValue: "No title", validation: { required: true } },
+                            start: { type: "date", from: "Start" },
+                            end: { type: "date", from: "End" },
+                            startTimezone: { from: "StartTimezone" },
+                            endTimezone: { from: "EndTimezone" },
+                            description: { from: "Description" },
+                            recurrenceId: { from: "RecurrenceID" },
+                            recurrenceRule: { from: "RecurrenceRule" },
+                            recurrenceException: { from: "RecurrenceException" },
+                            ownerId: { from: "OwnerID", defaultValue: 1 },
+                            isAllDay: { type: "boolean", from: "IsAllDay" }
+                        }
                     }
                 }
+                //filter: {
+                //    logic: "or",
+                //    filters: [
+                //        { field: "ownerId", operator: "eq", value: 1 },
+                //        { field: "ownerId", operator: "eq", value: 2 }
+                //    ]
+                //}
             },
-            schema: {
-                model: {
-                    id: "taskId",
-                    fields: {
-                        taskId: { from: "TaskID", type: "number" },
-                        title: { from: "Title", defaultValue: "No title", validation: { required: true } },
-                        start: { type: "date", from: "Start" },
-                        end: { type: "date", from: "End" },
-                        startTimezone: { from: "StartTimezone" },
-                        endTimezone: { from: "EndTimezone" },
-                        description: { from: "Description" },
-                        recurrenceId: { from: "RecurrenceID" },
-                        recurrenceRule: { from: "RecurrenceRule" },
-                        recurrenceException: { from: "RecurrenceException" },
-                        ownerId: { from: "OwnerID", defaultValue: 1 },
-                        isAllDay: { type: "boolean", from: "IsAllDay" }
-                    }
+            resources: [
+                {
+                    field: "ownerId",
+                    title: "Shared Accounts",
+                    dataSource: eventOwners
+                    //    [
+                    //    { text: "Alex", value: 1, color: "#f8a398" },
+                    //    { text: "Bob", value: 2, color: "#51a0ed" },
+                    //    { text: "Charlie", value: 3, color: "#56ca85" }
+                    //]
                 }
-            },
-            filter: {
-                logic: "or",
-                filters: [
-                    { field: "ownerId", operator: "eq", value: 1 },
-                    { field: "ownerId", operator: "eq", value: 2 }
-                ]
+            ]
+        });
+    }
+    
+    var url = controller + "GetOwners";
+    var isEmpty = function(variable) {
+        return variable === undefined || variable === null || variable.length === 0 || variable === "";
+    }
+    var isInTestingMode = true;
+    jQuery.ajax({
+        method: "GET", // by default "GET"
+        url: url,
+        dataType: "JSON" //, // "Text" , "HTML", "xml", "script" 
+        
+    }).done(function (owners) {
+        for (var i = 0; i < owners.length; i++) {
+            var owner = owners[i];
+            if (isEmpty(owner.color)) {
+                owners[i].color = "#51a0ed";
             }
-        },
-        resources: [
-            {
-                field: "ownerId",
-                title: "Owner",
-                dataSource: [
-                    { text: "Alex", value: 1, color: "#f8a398" },
-                    { text: "Bob", value: 2, color: "#51a0ed" },
-                    { text: "Charlie", value: 3, color: "#56ca85" }
-                ]
-            }
-        ]
+        }
+        initializeScheduler(owners);
+    }).fail(function (jqXHR, textStatus, exceptionMessage) {
+        console.log("Request failed: " + exceptionMessage);
+    }).always(function () {
+        console.log("complete");
     });
 
     var datePickerComponentEnable = function () {

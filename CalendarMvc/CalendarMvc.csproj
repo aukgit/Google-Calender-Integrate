@@ -46,8 +46,8 @@
       <HintPath>..\packages\BouncyCastle.1.7.0\lib\Net40-Client\BouncyCastle.Crypto.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevMvcComponent, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevMVCComponent.2.3.0\lib\DevMvcComponent.dll</HintPath>
+    <Reference Include="DevMvcComponent, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevMVCComponent.2.4.0\lib\DevMvcComponent.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Google.Apis, Version=1.11.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
@@ -255,12 +255,16 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="BusinessLogic\EventOwnerLogic.cs" />
+    <Compile Include="BusinessLogic\Logic.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\EwsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\OutlookTokensController.cs" />
     <Compile Include="Controllers\SchedulerController.cs" />
+    <Compile Include="Controllers\SharedCalendarsController.cs" />
+    <Compile Include="Extensions\AppointmentsToKendoViewModelExtension.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -300,6 +304,20 @@
     <Content Include="Content\css\ie-fix.min.css">
       <DependentUpon>ie-fix.css</DependentUpon>
     </Content>
+    <Content Include="Content\css\kendo\Material\editor.png" />
+    <Content Include="Content\css\kendo\Material\imagebrowser.png" />
+    <Content Include="Content\css\kendo\Material\indeterminate.gif" />
+    <Content Include="Content\css\kendo\Material\loading-image.gif" />
+    <Content Include="Content\css\kendo\Material\loading.gif" />
+    <Content Include="Content\css\kendo\Material\loading_2x.gif" />
+    <Content Include="Content\css\kendo\Material\markers.png" />
+    <Content Include="Content\css\kendo\Material\markers_2x.png" />
+    <Content Include="Content\css\kendo\Material\slider-h.gif" />
+    <Content Include="Content\css\kendo\Material\slider-v.gif" />
+    <Content Include="Content\css\kendo\Material\sprite.png" />
+    <Content Include="Content\css\kendo\Material\sprite_2x.png" />
+    <Content Include="Content\css\kendo\Material\sprite_kpi.png" />
+    <Content Include="Content\css\kendo\Material\sprite_kpi_2x.png" />
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\css\animate-refresh.css" />
@@ -580,7 +598,14 @@
     <Content Include="Views\Shared\EditorTemplates\String.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\TextArea.cshtml" />
     <Content Include="Views\Ews\Success.cshtml" />
-    <Content Include="Views\Ews\GetSharedCalendars.cshtml" />
+    <Content Include="Views\SharedCalendars\Create.cshtml" />
+    <Content Include="Views\SharedCalendars\Delete.cshtml" />
+    <Content Include="Views\SharedCalendars\Details.cshtml" />
+    <Content Include="Views\SharedCalendars\Edit.cshtml" />
+    <Content Include="Views\SharedCalendars\Index.cshtml" />
+    <Content Include="Views\Scheduler\Create.cshtml" />
+    <Content Include="Views\Scheduler\Update.cshtml" />
+    <Content Include="Views\Scheduler\Destroy.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\" />
@@ -592,7 +617,6 @@
     <Content Include="packages.config">
       <SubType>Designer</SubType>
     </Content>
-    <None Include="Project_Readme.html" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
