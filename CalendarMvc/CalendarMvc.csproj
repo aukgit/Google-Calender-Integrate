@@ -265,6 +265,7 @@
     <Compile Include="Controllers\SchedulerController.cs" />
     <Compile Include="Controllers\SharedCalendarsController.cs" />
     <Compile Include="Extensions\AppointmentsToKendoViewModelExtension.cs" />
+    <Compile Include="Extensions\EventOwnerExtension.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

@@ -11,10 +11,9 @@ namespace CalendarMvc.Models.ViewModel {
         public DateTime End { get; set; }
         public TimeZone EndTimezone { get; set; }        
         public bool IsAllDay { get; set; }
-        //public string Email { get; set; }
+        public string Email { get; set; }
         public string RecurrenceID { get; set; }
         public string RecurrenceRule { get; set; }
         public string RecurrenceException { get; set; }
-        
     }
 }

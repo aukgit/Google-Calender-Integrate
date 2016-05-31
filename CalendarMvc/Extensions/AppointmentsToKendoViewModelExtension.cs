@@ -21,14 +21,14 @@ namespace CalendarMvc.Extensions {
                 var hashCode = id.UniqueId.GetHashCode();
                 ids[hashCode] = id;
                 result.TaskID = hashCode;
-                //result.Email = n.Email;
+                result.Email = n.Email;
                 result.Title = n.Subject;
                 result.Description = n.Body;
                 result.Start = appointment.Start;
                 result.End = appointment.End;
                 result.IsAllDay = appointment.IsAllDayEvent;
                 return result;
-            });
+            }).ToList();
         }
     }
 }
