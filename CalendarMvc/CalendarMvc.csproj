@@ -297,6 +297,10 @@
     <Content Include="Content\css\bootstrap-datetimepicker.min.css">
       <DependentUpon>bootstrap-datetimepicker.css</DependentUpon>
     </Content>
+    <Content Include="Content\css\calendar.css" />
+    <Content Include="Content\css\calendar.min.css">
+      <DependentUpon>calendar.css</DependentUpon>
+    </Content>
     <Content Include="Content\css\header.css" />
     <Content Include="Content\css\header.min.css">
       <DependentUpon>header.css</DependentUpon>
@@ -511,6 +515,9 @@
     <Content Include="Content\css\ie-fix.css.map">
       <DependentUpon>ie-fix.css</DependentUpon>
     </Content>
+    <Content Include="Content\css\calendar.css.map">
+      <DependentUpon>calendar.css</DependentUpon>
+    </Content>
     <None Include="Content\css\Site.less" />
     <Content Include="Scripts\bootstrap-datetimepicker.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -527,6 +534,7 @@
     </Content>
     <Content Include="Content\less\header.variables.less" />
     <Content Include="Content\less\ie-fix.less" />
+    <Content Include="Content\less\calendar.less" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\detect-browser.js" />
     <Content Include="Scripts\jquery.validate.js" />

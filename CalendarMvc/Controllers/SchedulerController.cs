@@ -13,7 +13,7 @@ namespace CalendarMvc.Controllers {
     public class SchedulerController : Controller {
 
         //private static string[] scopes = { "https://outlook.office.com/mail.read" };
-        private Dictionary<string, ItemId> _ids;
+        private Dictionary<int, ItemId> _ids;
         private ApplicationDbContext db = new ApplicationDbContext();
         private EventOwnerLogic _eventOwnerLogic;
 
@@ -21,11 +21,11 @@ namespace CalendarMvc.Controllers {
             _eventOwnerLogic = new EventOwnerLogic(db);
         }
 
-        private Dictionary<string, ItemId> Ids {
+        private Dictionary<int, ItemId> Ids {
             get {
-                _ids = HttpContext.Cache["_ids"] as Dictionary<string, ItemId>;
+                _ids = HttpContext.Cache["_ids"] as Dictionary<int, ItemId>;
                 if (_ids == null) {
-                    _ids = new Dictionary<string, ItemId>(3000);
+                    _ids = new Dictionary<int, ItemId>(3000);
                     HttpContext.Cache["_ids"] = _ids;
                 }
                 return _ids;
@@ -34,6 +34,14 @@ namespace CalendarMvc.Controllers {
                 HttpContext.Cache["_ids"] = value;
             }
         }
+
+        private void SaveTaskId(Appointment appointment) {
+            var id = appointment.Id;
+            var hashCode = id.UniqueId.GetHashCode();
+            Ids[hashCode] = id;
+        }
+  
+
         public ActionResult GetOwners() {
             var owners = db.EventOwners.Select(n =>
                 new {
@@ -44,15 +52,11 @@ namespace CalendarMvc.Controllers {
             return Json(owners, JsonRequestBehavior.AllowGet);
         }
 
-    
+
         public JsonResult Read() {
             var service = App.ExchangeServiceAccess;
-            var meetings = service.GetCalendarItems(DateTime.Now.AddMonths(-2), DateTime.Now.AddMonths(2));
             var owners = db.EventOwners.ToList();
-            int i = 0;
-            var ids = Ids;
-            var adminOwner = owners.FirstOrDefault(owner => owner.Email == App.Email);
-            var kendoViewModels = meetings.ToList();
+            var kendoViewModels = service.GetEventsAsKendoSchedulerViewModel(owners, ids:Ids);
             //var isoJson = JsonConvert.SerializeObject(kendoViewModels);
             return Json(kendoViewModels, JsonRequestBehavior.AllowGet);
         }
@@ -68,8 +72,7 @@ namespace CalendarMvc.Controllers {
 
         public ActionResult Destroy(KendoSchedulerViewModel model) {
             var service = App.ExchangeServiceAccess;
-            var ids = Ids;
-            var id = ids[model.TaskID];
+            var id = Ids[model.TaskID];
             //var result = service.DestroyAppointment(model, id);
             service.DestroyAppointment(model, id);
             return Json(model, JsonRequestBehavior.AllowGet);
@@ -87,7 +90,7 @@ namespace CalendarMvc.Controllers {
                      model.End,
                      isAllDay: model.IsAllDay,
                      attendees: attendees);
-                model.TaskID = createdAppointment.Id.UniqueId;
+                SaveTaskId(createdAppointment);
             }
             return Json(model, JsonRequestBehavior.AllowGet);
         }

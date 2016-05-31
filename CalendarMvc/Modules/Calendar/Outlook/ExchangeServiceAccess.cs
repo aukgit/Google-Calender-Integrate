@@ -1,27 +1,29 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
+using System.Text;
 using CalendarMvc.Extensions;
 using CalendarMvc.Models;
 using CalendarMvc.Models.ViewModel;
 using Microsoft.Exchange.WebServices.Data;
 
 namespace CalendarMvc.Modules.Calendar.Outlook {
+    [Serializable]
     public class ExchangeServiceAccess {
         private readonly string _email;
         private readonly string _password;
-        private ExchangeService _service;
 
         private bool _isServiceCredentialsAreSet;
+        private readonly ExchangeService _service;
 
         /// <summary>
-        /// Default version : ExchangeVersion.Exchange2013_SP1
+        ///     Default version : ExchangeVersion.Exchange2013_SP1
         /// </summary>
         /// <param name="email"></param>
         /// <param name="password"></param>
-        public ExchangeServiceAccess(string email, string password) : this(email, password, ExchangeVersion.Exchange2013_SP1) { }
+        public ExchangeServiceAccess(string email, string password)
+            : this(email, password, ExchangeVersion.Exchange2013_SP1) {}
 
         public ExchangeServiceAccess(string email, string password, ExchangeVersion version) {
             _email = email;
@@ -74,8 +76,8 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         }
 
         /// <summary>
-        /// Finds recurring master calendar items, occurrences and exceptions for recurring calendar items,
-        /// and single occurrence calendar items by using the FindItem operation.
+        ///     Finds recurring master calendar items, occurrences and exceptions for recurring calendar items,
+        ///     and single occurrence calendar items by using the FindItem operation.
         /// </summary>
         /// <param name="queryFilter">Give search string</param>
         public FindItemsResults<Item> GetCalendarItems(int possibleItems = 100, string queryFilter = null) {
@@ -95,12 +97,13 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         }
 
         /// <summary>
-        /// Finds recurring master calendar items, occurrences and exceptions for recurring calendar items,
-        /// and single occurrence calendar items by using the FindItem operation.
+        ///     Finds recurring master calendar items, occurrences and exceptions for recurring calendar items,
+        ///     and single occurrence calendar items by using the FindItem operation.
         /// </summary>
         /// <param name="queryFilter">Give search string</param>
         /// <param name="folderId"></param>
-        public FindItemsResults<Item> GetCalendarItems(FolderId folderId, int possibleItems = 100, string queryFilter = null) {
+        public FindItemsResults<Item> GetCalendarItems(FolderId folderId, int possibleItems = 100,
+            string queryFilter = null) {
             // Specify a view that returns up to five recurring master items.
             var view = new ItemView(possibleItems);
             // Specify a calendar view for returning instances of a recurring series.
@@ -117,14 +120,14 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         }
 
         /// <summary>
-        /// Finds recurring master calendar items, occurrences and exceptions for recurring calendar items,
-        /// and single occurrence calendar items by using the FindItem operation.
+        ///     Finds recurring master calendar items, occurrences and exceptions for recurring calendar items,
+        ///     and single occurrence calendar items by using the FindItem operation.
         /// </summary>
         /// <param name="eventOwners"></param>
         /// <param name="possibleItems"></param>
         /// <param name="queryFilter">Give search string</param>
-        /// <param name="folderIds"></param>
-        public List<KendoSchedulerViewModel> GetEventsAsKendoSchedulerViewModel(List<EventOwner> eventOwners, int possibleItems = 500, string queryFilter = null) {
+        public List<KendoSchedulerViewModel> GetEventsAsKendoSchedulerViewModel(List<EventOwner> eventOwners,
+            int possibleItems = 500, Dictionary<int, ItemId> ids = null, string queryFilter = null) {
             // Specify a view that returns up to five recurring master items.
             var view = new ItemView(possibleItems);
             // Specify a calendar view for returning instances of a recurring series.
@@ -133,47 +136,51 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                 // Find up to the first five recurring master appointments in the calendar with 'Weekly Tennis Lesson' set for the subject property.
                 // This results in a FindItem operation call to EWS. This will return the recurring master
                 // appointment.
-                var list = new List<KendoSchedulerViewModel>(possibleItems * (folderIds.Length -1));
+                var list = new List<KendoSchedulerViewModel>(possibleItems*(eventOwners.Count - 1));
                 foreach (var eventOwner in eventOwners) {
                     var folderId = eventOwner.AsFolderId();
-                    var appointments = _service.FindItems(folderId, queryFilter, view);
-                    foreach (var appointment in appointments) {
+                    var meeetings = _service.FindItems(folderId, queryFilter, view);
+                    AttachOrganizerProperty(ref meeetings);
+                    foreach (var meeting in meeetings) {
                         var m = new KendoSchedulerViewModel();
-                        m.Title = appointment.Subject;
-                        if (eventOwner != null) {
-                            m.OwnerID = eventOwner.EventOwnerID;
+                        m.Title = meeting.Subject;
+                        m.Description = meeting.Body;
+                        m.OwnerID = eventOwner.EventOwnerID;
+                        var appointment = (Appointment) meeting;
+                        if (ids != null) {
+                            var id = appointment.Id;
+                            var hashCode = id.UniqueId.GetHashCode();
+                            ids[hashCode] = id;
+                            m.TaskID = hashCode;
                         }
-                        var id = appointment.Meeting.Id;
-                        var hashCode = id.UniqueId.GetHashCode();
-                        ids[hashCode] = id;
-                        result.TaskID = hashCode;
-                        result.Email = n.Email;
-                        result.Title = n.Subject;
-                        result.Description = n.Body;
-                        result.Start = appointment.Start;
-                        result.End = appointment.End;
-                        result.IsAllDay = appointment.IsAllDayEvent;
-                        return result;
+                        m.Email = appointment.Organizer.Address;
+                        m.Start = appointment.Start;
+                        m.End = appointment.End;
+                        m.IsAllDay = appointment.IsAllDayEvent;
+                        list.Add(m);
                     }
                 }
+                return list;
             } catch (Exception ex) {
                 Console.WriteLine("Error: " + ex.Message);
             }
             return null;
         }
 
-        public FindItemsResults<Item> AttachOrganizerProperty(FindItemsResults<Item> events) {
+        public void AttachOrganizerProperty(ref FindItemsResults<Item> events) {
             var itmPropSet = new PropertySet(BasePropertySet.FirstClassProperties);
             itmPropSet.RequestedBodyType = BodyType.Text;
             _service.LoadPropertiesForItems(events, itmPropSet);
-        } 
+        }
+
         public FolderId GetFolderId(string email) {
             var mailBox = new Mailbox(email, null);
             return new FolderId(WellKnownFolderName.Calendar, mailBox);
         }
+
         /// <summary>
-        /// Finds recurring master calendar items, occurrences and exceptions for recurring calendar items,
-        /// and single occurrence calendar items by using the FindItem operation.
+        ///     Finds recurring master calendar items, occurrences and exceptions for recurring calendar items,
+        ///     and single occurrence calendar items by using the FindItem operation.
         /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
@@ -217,15 +224,15 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             }
             return null;
         }
+
         public Dictionary<string, Folder> GetCalendarFolders(string searchIn = "My Calendars") {
             var rtList = new Dictionary<string, Folder>();
 
-            var rfRootFolderid = new FolderId(WellKnownFolderName.Root);//, mbMailboxname
+            var rfRootFolderid = new FolderId(WellKnownFolderName.Root); //, mbMailboxname
             var fvFolderView = new FolderView(1000);
             SearchFilter sfSearchFilter = new SearchFilter.IsEqualTo(FolderSchema.DisplayName, "Common Views");
             var ffoldres = _service.FindFolders(rfRootFolderid, sfSearchFilter, fvFolderView);
             if (ffoldres.Folders.Count == 1) {
-
                 var psPropset = new PropertySet(BasePropertySet.FirstClassProperties);
                 var pidTagWlinkAddressBookEid = new ExtendedPropertyDefinition(0x6854, MapiPropertyType.Binary);
                 var pidTagWlinkFolderType = new ExtendedPropertyDefinition(0x684F, MapiPropertyType.Binary);
@@ -244,45 +251,41 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                         object groupName = null;
                         object wlinkAddressBookEid = null;
                         if (itItem.TryGetProperty(pidTagWlinkAddressBookEid, out wlinkAddressBookEid)) {
-
-                            var ssStoreId = (byte[])wlinkAddressBookEid;
+                            var ssStoreId = (byte[]) wlinkAddressBookEid;
                             var leLegDnStart = 0;
                             var lnLegDn = "";
-                            for (var ssArraynum = (ssStoreId.Length - 2); ssArraynum != 0; ssArraynum--) {
+                            for (var ssArraynum = ssStoreId.Length - 2; ssArraynum != 0; ssArraynum--) {
                                 if (ssStoreId[ssArraynum] == 0) {
                                     leLegDnStart = ssArraynum;
-                                    lnLegDn = System.Text.Encoding.ASCII.GetString(ssStoreId, leLegDnStart + 1, (ssStoreId.Length - (leLegDnStart + 2)));
+                                    lnLegDn = Encoding.ASCII.GetString(ssStoreId, leLegDnStart + 1,
+                                        ssStoreId.Length - (leLegDnStart + 2));
                                     ssArraynum = 1;
                                 }
                             }
                             var ncCol = _service.ResolveName(lnLegDn, ResolveNameSearchLocation.DirectoryOnly, true);
                             if (ncCol.Count > 0) {
-
-                                var sharedCalendarId = new FolderId(WellKnownFolderName.Calendar, ncCol[0].Mailbox.Address);
+                                var sharedCalendarId = new FolderId(WellKnownFolderName.Calendar,
+                                    ncCol[0].Mailbox.Address);
                                 var sharedCalendaFolder = Folder.Bind(_service, sharedCalendarId);
                                 rtList.Add(ncCol[0].Mailbox.Address, sharedCalendaFolder);
-
-
                             }
-
                         }
                     } catch (Exception exception) {
                         Console.WriteLine(exception.Message);
                     }
-
                 }
             }
             return rtList;
         }
-        public List<OutlookFolder> GetSharedCalendarFolders(String searchIn = "My Calendars") {
+
+        public List<OutlookFolder> GetSharedCalendarFolders(string searchIn = "My Calendars") {
             var list = new List<OutlookFolder>(25);
 
-            var rfRootFolderid = new FolderId(WellKnownFolderName.Root);//, mbMailboxname
+            var rfRootFolderid = new FolderId(WellKnownFolderName.Root); //, mbMailboxname
             var fvFolderView = new FolderView(1000);
             SearchFilter sfSearchFilter = new SearchFilter.IsEqualTo(FolderSchema.DisplayName, "Common Views");
             var ffoldres = _service.FindFolders(rfRootFolderid, sfSearchFilter, fvFolderView);
             if (ffoldres.Folders.Count == 1) {
-
                 var propertySet = new PropertySet(BasePropertySet.FirstClassProperties);
                 var pidTagWlinkAddressBookEid = new ExtendedPropertyDefinition(0x6854, MapiPropertyType.Binary);
                 var pidTagWlinkFolderType = new ExtendedPropertyDefinition(0x684F, MapiPropertyType.Binary);
@@ -300,20 +303,21 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                     try {
                         object wlinkAddressBookEid = null;
                         if (itItem.TryGetProperty(pidTagWlinkAddressBookEid, out wlinkAddressBookEid)) {
-
-                            var ssStoreId = (byte[])wlinkAddressBookEid;
+                            var ssStoreId = (byte[]) wlinkAddressBookEid;
                             var lnLegDn = "";
-                            for (var ssArraynum = (ssStoreId.Length - 2); ssArraynum != 0; ssArraynum--) {
+                            for (var ssArraynum = ssStoreId.Length - 2; ssArraynum != 0; ssArraynum--) {
                                 if (ssStoreId[ssArraynum] == 0) {
                                     var leLegDnStart = ssArraynum;
-                                    lnLegDn = System.Text.Encoding.ASCII.GetString(ssStoreId, leLegDnStart + 1, (ssStoreId.Length - (leLegDnStart + 2)));
+                                    lnLegDn = Encoding.ASCII.GetString(ssStoreId, leLegDnStart + 1,
+                                        ssStoreId.Length - (leLegDnStart + 2));
                                     ssArraynum = 1;
                                 }
                             }
                             var ncCol = _service.ResolveName(lnLegDn, ResolveNameSearchLocation.DirectoryOnly, true);
                             if (ncCol.Count > 0) {
                                 var outlookFolder = new OutlookFolder();
-                                var sharedCalendarId = new FolderId(WellKnownFolderName.Calendar, ncCol[0].Mailbox.Address);
+                                var sharedCalendarId = new FolderId(WellKnownFolderName.Calendar,
+                                    ncCol[0].Mailbox.Address);
                                 var sharedCalendaFolder = Folder.Bind(_service, sharedCalendarId);
                                 outlookFolder.FolderId = sharedCalendarId;
                                 outlookFolder.Folder = sharedCalendaFolder;
@@ -322,15 +326,11 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                                 outlookFolder.DisplayName = outlookFolder.MailBox.Name;
 
                                 list.Add(outlookFolder);
-
-
                             }
-
                         }
                     } catch (Exception exception) {
                         Console.WriteLine(exception.Message);
                     }
-
                 }
             }
             return list;
@@ -377,10 +377,11 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                 }
             }
         }
+
         public KendoSchedulerViewModel UpdateAppointment(KendoSchedulerViewModel m, ItemId id, string[] attendees = null) {
             //Appointment meeting = new Appointment(_service);
             var item = Item.Bind(_service, id, new PropertySet(ItemSchema.Subject));
-            var appointment = (Appointment)item;
+            var appointment = (Appointment) item;
             appointment.Subject = m.Title;
             appointment.Body = m.Description;
             appointment.Start = m.Start;
@@ -390,14 +391,12 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             //appointment.title
             item.Update(ConflictResolutionMode.AlwaysOverwrite);
             return m;
-          
         }
 
         public void DestroyAppointment(KendoSchedulerViewModel m, ItemId id) {
             var item = Item.Bind(_service, id, new PropertySet(ItemSchema.Subject));
-            var appointment = (Appointment)item;
+            var appointment = (Appointment) item;
             appointment.Delete(DeleteMode.MoveToDeletedItems);
         }
     }
-
 }

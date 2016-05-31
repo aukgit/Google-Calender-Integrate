@@ -4,7 +4,7 @@
         var $scheduler = $("#scheduler");
 
         $scheduler.kendoScheduler({
-            height: 600,
+            height: 1024,
             views: [
                 "day",
                 "workWeek",
@@ -27,7 +27,7 @@
                         dataType: "json"
                     },
                     create: {
-                        url: controller +  "create",
+                        url: controller + "create",
                         dataType: "json"
                     },
                     destroy: {
@@ -48,7 +48,7 @@
                     model: {
                         id: "taskId",
                         fields: {
-                            taskId: { from: "TaskID"},
+                            taskId: { from: "TaskID" },
                             title: { from: "Title", defaultValue: "No title", validation: { required: true } },
                             start: { type: "date", from: "Start" },
                             end: { type: "date", from: "End" },
@@ -74,8 +74,9 @@
             resources: [
                 {
                     field: "ownerId",
-                    title: "Shared Accounts",
-                    dataSource: eventOwners
+                    title: "Account",
+                    dataSource: eventOwners,
+                    //multiple: true
                     //    [
                     //    { text: "Alex", value: 1, color: "#f8a398" },
                     //    { text: "Bob", value: 2, color: "#51a0ed" },
@@ -85,9 +86,9 @@
             ]
         });
     }
-    
+
     var url = controller + "GetOwners";
-    var isEmpty = function(variable) {
+    var isEmpty = function (variable) {
         return variable === undefined || variable === null || variable.length === 0 || variable === "";
     }
     var isInTestingMode = true;
@@ -95,13 +96,19 @@
         method: "GET", // by default "GET"
         url: url,
         dataType: "JSON" //, // "Text" , "HTML", "xml", "script" 
-        
+
     }).done(function (owners) {
+        var $eventOwnerHtml = $("#event-owners");
         for (var i = 0; i < owners.length; i++) {
             var owner = owners[i];
             if (isEmpty(owner.color)) {
                 owners[i].color = "#51a0ed";
             }
+            var $li = $("<li></li>", {
+                'text': owner.text,
+                'style': 'float:left;background-color:' + owner.color,
+            });
+            $eventOwnerHtml.append($li);
         }
         initializeScheduler(owners);
     }).fail(function (jqXHR, textStatus, exceptionMessage) {

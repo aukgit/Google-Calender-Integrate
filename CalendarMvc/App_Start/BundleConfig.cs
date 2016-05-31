@@ -52,6 +52,7 @@ namespace CalendarMvc {
                     stylesFolder + "less-imports.css",
                     stylesFolder + "animate.min.css",
                     stylesFolder + "font-awesome.min.css",
+                    stylesFolder + "calendar.css",
                     stylesFolder + "site.css",
                     stylesFolder + "header.css",
 

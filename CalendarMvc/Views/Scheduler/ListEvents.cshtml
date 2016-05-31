@@ -1,7 +1,6 @@
 ﻿@{
-    ViewBag.Title = "Index";
-    var events = (IList<Event>)ViewBag.events;
-    string when;
+    ViewBag.Title = "Schedule";
+    ViewBag.pageClass = "scheduler-page";
 }
 @*<h2>Events names :</h2>
     <ul>
@@ -23,5 +22,7 @@
         }
     </ul>*@
 
-
+<ul id="event-owners">
+    
+</ul>
 <div id="scheduler"></div>
