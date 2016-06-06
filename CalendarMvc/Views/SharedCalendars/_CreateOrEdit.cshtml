@@ -1,0 +1,5 @@
+﻿@model CalendarMvc.Models.EventOwner
+
+@Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+@Html.EditorFor(model => model.OwnerName)
+@Html.EditorFor(model => model.Color, new { @class = "color-picker" })

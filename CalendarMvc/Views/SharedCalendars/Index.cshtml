@@ -2,6 +2,7 @@
 
 @{
     ViewBag.Title = "Index";
+    ViewBag.pageClass = "event-owners-list-page";
 }
 
 <h2>Index</h2>
@@ -31,8 +32,8 @@
         <td>
             @Html.DisplayFor(modelItem => item.OwnerName)
         </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Color)
+        <td class="color-display" style="background-color:@item.Color">
+            <span class="text-shadow">@Html.DisplayFor(modelItem => item.Color)</span>
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.EventOwnerID }) |

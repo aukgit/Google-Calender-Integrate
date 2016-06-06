@@ -23,4 +23,15 @@
   list-style: none;
   color: white;
 }
+.event-owners-list-page .color-display {
+  color: white;
+}
+.shadow {
+  -webkit-box-shadow: 12px 12px 7px -9px rgba(0, 0, 0, 0.57);
+  -moz-box-shadow: 12px 12px 7px -9px rgba(0, 0, 0, 0.57);
+  box-shadow: 12px 12px 7px -9px rgba(0, 0, 0, 0.57);
+}
+.text-shadow {
+  text-shadow: #030303 2px 0px 2px;
+}
 /*# sourceMappingURL=calendar.css.map */

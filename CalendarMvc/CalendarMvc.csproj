@@ -309,6 +309,10 @@
     <Content Include="Content\css\ie-fix.min.css">
       <DependentUpon>ie-fix.css</DependentUpon>
     </Content>
+    <Content Include="Content\css\kendo\images\back.png" />
+    <Content Include="Content\css\kendo\images\kendoui.svg" />
+    <Content Include="Content\css\kendo\images\wp8_icons.png" />
+    <Content Include="Content\css\kendo\images\wp8_inverseicons.png" />
     <Content Include="Content\css\kendo\Material\editor.png" />
     <Content Include="Content\css\kendo\Material\imagebrowser.png" />
     <Content Include="Content\css\kendo\Material\indeterminate.gif" />
@@ -518,6 +522,8 @@
     <Content Include="Content\css\calendar.css.map">
       <DependentUpon>calendar.css</DependentUpon>
     </Content>
+    <Content Include="Content\css\kendo\images\kendoui.ttf" />
+    <Content Include="Content\css\kendo\images\kendoui.woff" />
     <None Include="Content\css\Site.less" />
     <Content Include="Scripts\bootstrap-datetimepicker.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -615,6 +621,7 @@
     <Content Include="Views\Scheduler\Create.cshtml" />
     <Content Include="Views\Scheduler\Update.cshtml" />
     <Content Include="Views\Scheduler\Destroy.cshtml" />
+    <Content Include="Views\SharedCalendars\_CreateOrEdit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\" />

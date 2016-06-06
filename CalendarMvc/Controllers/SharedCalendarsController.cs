@@ -22,10 +22,10 @@ namespace CalendarMvc.Controllers {
             if (eventOwner2 == null) {
                 eventOwner2 = new EventOwner();
                 db.EventOwners.Add(eventOwner2); //insert
+                eventOwner2.Color = HexConverter(Color.Red);
             }
             eventOwner2.Email = App.Email;
             eventOwner2.OwnerName = App.EmailDisplay;
-            eventOwner2.Color = HexConverter(Color.Red);
             foreach (var folder in sharedFolders) {
                 var email = folder.Email;
                 var eventOwner = db.EventOwners.FirstOrDefault(n => n.Email == email);

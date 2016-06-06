@@ -45,7 +45,7 @@ namespace CalendarMvc {
             bundles.Add(new StyleBundle(stylesFolder + "css").Include(
                     stylesFolder + "bootstrap.css",
                     stylesFolder + "kendo/kendo.common.css",
-                    stylesFolder + "kendo/kendo.default.css",
+                    //stylesFolder + "kendo/kendo.default.css",
                     stylesFolder + "kendo/kendo.material.min.css",
                     stylesFolder + "bootstrap.css",
 

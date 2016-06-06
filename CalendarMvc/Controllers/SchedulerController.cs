@@ -56,7 +56,9 @@ namespace CalendarMvc.Controllers {
         public JsonResult Read() {
             var service = App.ExchangeServiceAccess;
             var owners = db.EventOwners.ToList();
-            var kendoViewModels = service.GetEventsAsKendoSchedulerViewModel(owners, ids:Ids);
+            var ids = Ids;
+            var kendoViewModels = service.GetEventsAsKendoSchedulerViewModel(owners, ids: ids);
+            Ids = ids;
             //var isoJson = JsonConvert.SerializeObject(kendoViewModels);
             return Json(kendoViewModels, JsonRequestBehavior.AllowGet);
         }
@@ -74,7 +76,7 @@ namespace CalendarMvc.Controllers {
             var service = App.ExchangeServiceAccess;
             var id = Ids[model.TaskID];
             //var result = service.DestroyAppointment(model, id);
-            service.DestroyAppointment(model, id);
+            service.DestroyAppointment(id);
             return Json(model, JsonRequestBehavior.AllowGet);
         }
 

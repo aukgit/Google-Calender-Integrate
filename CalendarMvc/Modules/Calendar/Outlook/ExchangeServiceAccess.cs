@@ -6,6 +6,7 @@ using System.Text;
 using CalendarMvc.Extensions;
 using CalendarMvc.Models;
 using CalendarMvc.Models.ViewModel;
+using DevMvcComponent;
 using Microsoft.Exchange.WebServices.Data;
 
 namespace CalendarMvc.Modules.Calendar.Outlook {
@@ -23,7 +24,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         /// <param name="email"></param>
         /// <param name="password"></param>
         public ExchangeServiceAccess(string email, string password)
-            : this(email, password, ExchangeVersion.Exchange2013_SP1) {}
+            : this(email, password, ExchangeVersion.Exchange2013_SP1) { }
 
         public ExchangeServiceAccess(string email, string password, ExchangeVersion version) {
             _email = email;
@@ -131,39 +132,43 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             // Specify a view that returns up to five recurring master items.
             var view = new ItemView(possibleItems);
             // Specify a calendar view for returning instances of a recurring series.
+            view.Traversal = ItemTraversal.Shallow;
 
-            try {
-                // Find up to the first five recurring master appointments in the calendar with 'Weekly Tennis Lesson' set for the subject property.
-                // This results in a FindItem operation call to EWS. This will return the recurring master
-                // appointment.
-                var list = new List<KendoSchedulerViewModel>(possibleItems*(eventOwners.Count - 1));
-                foreach (var eventOwner in eventOwners) {
-                    var folderId = eventOwner.AsFolderId();
-                    var meeetings = _service.FindItems(folderId, queryFilter, view);
-                    AttachOrganizerProperty(ref meeetings);
-                    foreach (var meeting in meeetings) {
-                        var m = new KendoSchedulerViewModel();
-                        m.Title = meeting.Subject;
-                        m.Description = meeting.Body;
-                        m.OwnerID = eventOwner.EventOwnerID;
-                        var appointment = (Appointment) meeting;
-                        if (ids != null) {
-                            var id = appointment.Id;
-                            var hashCode = id.UniqueId.GetHashCode();
-                            ids[hashCode] = id;
-                            m.TaskID = hashCode;
-                        }
-                        m.Email = appointment.Organizer.Address;
-                        m.Start = appointment.Start;
-                        m.End = appointment.End;
-                        m.IsAllDay = appointment.IsAllDayEvent;
-                        list.Add(m);
-                    }
+            // Find up to the first five recurring master appointments in the calendar with 'Weekly Tennis Lesson' set for the subject property.
+            // This results in a FindItem operation call to EWS. This will return the recurring master
+            // appointment.
+            var list = new List<KendoSchedulerViewModel>(possibleItems * (eventOwners.Count - 1));
+            FindItemsResults<Item> meeetings = null;
+
+            foreach (var eventOwner in eventOwners) {
+                var folderId = eventOwner.AsFolderId();
+                try {
+                    meeetings = _service.FindItems(folderId, queryFilter, view);
+                } catch (Exception ex) {
+                    Mvc.Error.HandleBy(ex, "GetEventsAsKendoSchedulerViewModel" );
                 }
-                return list;
-            } catch (Exception ex) {
-                Console.WriteLine("Error: " + ex.Message);
+                AttachOrganizerProperty(ref meeetings);
+                foreach (var meeting in meeetings) {
+                    var m = new KendoSchedulerViewModel();
+                    m.Title = meeting.Subject;
+                    m.Description = meeting.Body;
+                    m.OwnerID = eventOwner.EventOwnerID;
+                    var appointment = (Appointment)meeting;
+                    if (ids != null) {
+                        var id = appointment.Id;
+                        var hashCode = id.UniqueId.GetHashCode();
+                        ids[hashCode] = id;
+                        m.TaskID = hashCode;
+                    }
+                    m.Email = appointment.Organizer.Address;
+                    m.Start = appointment.Start;
+                    m.End = appointment.End;
+                    m.IsAllDay = appointment.IsAllDayEvent;
+                    list.Add(m);
+                }
             }
+            return list;
+
             return null;
         }
 
@@ -251,7 +256,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                         object groupName = null;
                         object wlinkAddressBookEid = null;
                         if (itItem.TryGetProperty(pidTagWlinkAddressBookEid, out wlinkAddressBookEid)) {
-                            var ssStoreId = (byte[]) wlinkAddressBookEid;
+                            var ssStoreId = (byte[])wlinkAddressBookEid;
                             var leLegDnStart = 0;
                             var lnLegDn = "";
                             for (var ssArraynum = ssStoreId.Length - 2; ssArraynum != 0; ssArraynum--) {
@@ -303,7 +308,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                     try {
                         object wlinkAddressBookEid = null;
                         if (itItem.TryGetProperty(pidTagWlinkAddressBookEid, out wlinkAddressBookEid)) {
-                            var ssStoreId = (byte[]) wlinkAddressBookEid;
+                            var ssStoreId = (byte[])wlinkAddressBookEid;
                             var lnLegDn = "";
                             for (var ssArraynum = ssStoreId.Length - 2; ssArraynum != 0; ssArraynum--) {
                                 if (ssStoreId[ssArraynum] == 0) {
@@ -381,7 +386,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         public KendoSchedulerViewModel UpdateAppointment(KendoSchedulerViewModel m, ItemId id, string[] attendees = null) {
             //Appointment meeting = new Appointment(_service);
             var item = Item.Bind(_service, id, new PropertySet(ItemSchema.Subject));
-            var appointment = (Appointment) item;
+            var appointment = (Appointment)item;
             appointment.Subject = m.Title;
             appointment.Body = m.Description;
             appointment.Start = m.Start;
@@ -389,14 +394,32 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
             appointment.IsAllDayEvent = m.IsAllDay;
             AddAttendees(appointment, attendees, false);
             //appointment.title
-            item.Update(ConflictResolutionMode.AlwaysOverwrite);
+            try {
+                item.Update(ConflictResolutionMode.AutoResolve);
+            } catch (Exception ex) {
+                Mvc.Error.HandleBy(ex, "UpdateAppointment", appointment);
+                try {
+                    item.Update(ConflictResolutionMode.AlwaysOverwrite);
+                } catch (Exception ex2) {
+                    Mvc.Error.HandleBy(ex2, "UpdateAppointment - AlwaysOverwrite", appointment);
+                }
+            }
             return m;
         }
 
-        public void DestroyAppointment(KendoSchedulerViewModel m, ItemId id) {
+        public void DestroyAppointment(ItemId id) {
             var item = Item.Bind(_service, id, new PropertySet(ItemSchema.Subject));
-            var appointment = (Appointment) item;
-            appointment.Delete(DeleteMode.MoveToDeletedItems);
+            var appointment = (Appointment)item;
+            try {
+                appointment.Delete(DeleteMode.MoveToDeletedItems);
+            } catch (Exception ex) {
+                Mvc.Error.HandleBy(ex, "DestroyAppointment", appointment);
+                try {
+                    appointment.Delete(DeleteMode.HardDelete);
+                } catch (Exception ex2) {
+                    Mvc.Error.HandleBy(ex2, "DestroyAppointment - HardDelete", appointment);
+                }
+            }
         }
     }
 }
