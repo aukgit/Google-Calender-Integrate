@@ -46,5 +46,117 @@
 
 .text-shadow {
     //background-color: rgb(120, 120, 120);
-    text-shadow: rgb(3, 3, 3) 2px 0px 2px;
+    text-shadow: rgb(3, 3, 3) 2px 0 2px;
+}
+
+
+.styles-k-event() {
+    .border-sizing();
+    background: none;
+    height: 23px;
+    border: none;
+    border-radius: unset;
+}
+
+.k-event, .k-event-inverse {
+    .styles-k-event() !important;
+}
+
+@row-height: 240px;
+
+.row-height(@height: 180px) {
+    height: @height !important;
+}
+
+.width-important(@width: 26px) {
+    width: @width !important;
+}
+
+.border-sizing() {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.k-scheduler-timelineview {
+    .border-sizing;
+
+    tr:nth-child(2) {
+        .k-scheduler-times {
+            .row-height(auto);
+
+            .k-scheduler-table {
+                .row-height(auto);
+
+
+                tr:nth-child(2n+2) th {
+                    background: #f8f8f8;
+                }
+
+
+                tr {
+                    // left side content
+                    .row-height(15px);
+                }
+                tr:hover th{
+                    background-color:#eaeaea;
+                    }
+            }
+        }
+
+        .k-scheduler-content {
+            .k-scheduler-table {
+                // right side content area
+                .row-height(auto);
+
+                tr {
+                    // right side
+                    .row-height(15px);
+
+                    td {
+                        // content cell
+                        //.width-important(12px);
+                    }
+                }
+
+                tr:nth-child(2n+1) td {
+                    background: white;
+                }
+                tr:hover td{
+                    background-color:#eaeaea;
+                    }
+            }
+        }
+    }
+
+
+}
+
+
+
+.k-scheduler-times {
+    tr {
+        height: 24px !important;
+    }
+}
+
+.event-box {
+    height: 75%;
+    border: 1px solid black !important;
+
+    &.orange {
+        background-color: rgb(246, 131, 36);
+    }
+
+    &.blue {
+        background-color: rgb(65, 123, 173);
+    }
+
+    &.violet {
+        background-color: rgb(114, 87, 146);
+    }
+
+    &.red-border {
+        border: 2px solid red !important;
+    }
 }

@@ -4,42 +4,44 @@
         var $scheduler = $("#scheduler");
 
         $scheduler.kendoScheduler({
-            date: new Date("2013/6/13"),
-            startTime: new Date("2013/6/13 07:00 AM"),
-            eventHeight: 50,
-            majorTick: 60,
             height: 1024,
             views: [
                 "day",
                 "workWeek",
                 "week",
-                { type: "month", selected: true },
+                { type: "month" },
                 "agenda",
-                { type: "timeline", eventHeight: 50 }
+                { type: "timeline",selected: true , eventHeight: 50 }
             ],
             timezone: "Etc/UTC",
+            eventTemplate: $("#event-template").html(),
             dataSource: {
                 batch: true,
                 transport: {
                     read: {
-                        url: "//demos.telerik.com/kendo-ui/service/meetings",
-                        dataType: "jsonp"
+                        url: controller + "Read",
+                        dataType: "json"
                     },
-                    update: {
-                        url: "//demos.telerik.com/kendo-ui/service/meetings/update",
-                        dataType: "jsonp"
-                    },
-                    create: {
-                        url: "//demos.telerik.com/kendo-ui/service/meetings/create",
-                        dataType: "jsonp"
-                    },
-                    destroy: {
-                        url: "//demos.telerik.com/kendo-ui/service/meetings/destroy",
-                        dataType: "jsonp"
-                    },
+                    //update: {
+                    //    //url: "//demos.telerik.com/kendo-ui/service/tasks/update",
+                    //    url: controller + "update",
+                    //    dataType: "json"
+                    //},
+                    //create: {
+                    //    url: controller + "create",
+                    //    dataType: "json"
+                    //},
+                    //destroy: {
+                    //    url: controller + "destroy",
+                    //    dataType: "json"
+                    //},
                     parameterMap: function (options, operation) {
                         if (operation !== "read" && options.models) {
-                            return { models: kendo.stringify(options.models) };
+                            var result = options.models[0];
+                            result.Start = result.Start.toUTCString();
+                            result.End = result.End.toUTCString();
+
+                            return options.models[0];
                         }
                     }
                 },
@@ -71,20 +73,20 @@
                 //}
             },
             group: {
-                resources: ["Attendees"],
+                resources: ["ownerId"],
                 orientation: "vertical"
             },
             resources: [
                 {
-                    field: "attendees",
-                    name: "Attendees",
-                    dataSource: [
-                        { text: "Alex", value: 1, color: "#f8a398" },
-                        { text: "Bob", value: 2, color: "#51a0ed" },
-                        { text: "Charlie", value: 3, color: "#56ca85" }
-                    ],
-                    multiple: true,
-                    title: "Attendees"
+                    field: "ownerId",
+                    title: "Account",
+                    dataSource: eventOwners,
+                    //multiple: true
+                    //    [
+                    //    { text: "Alex", value: 1, color: "#f8a398" },
+                    //    { text: "Bob", value: 2, color: "#51a0ed" },
+                    //    { text: "Charlie", value: 3, color: "#56ca85" }
+                    //]
                 }
             ]
         });
@@ -101,37 +103,25 @@
         dataType: "JSON" //, // "Text" , "HTML", "xml", "script" 
 
     }).done(function (owners) {
-        var $eventOwnerHtml = $("#event-owners");
-        for (var i = 0; i < owners.length; i++) {
-            var owner = owners[i];
-            if (isEmpty(owner.color)) {
-                owners[i].color = "#51a0ed";
-            }
-            var $li = $("<li></li>", {
-                'text': owner.text,
-                'style': 'float:left;background-color:' + owner.color,
-            });
-            $eventOwnerHtml.append($li);
-        }
+        //var $eventOwnerHtml = $("#event-owners");
+        //for (var i = 0; i < owners.length; i++) {
+        //    var owner = owners[i];
+        //    if (isEmpty(owner.color)) {
+        //        owners[i].color = "#51a0ed";
+        //    }
+        //    var $li = $("<li></li>", {
+        //        'text': owner.text,
+        //        'style': 'float:left;background-color:' + owner.color,
+        //    });
+        //    $eventOwnerHtml.append($li);
+        //}
         initializeScheduler(owners);
     }).fail(function (jqXHR, textStatus, exceptionMessage) {
         console.log("Request failed: " + exceptionMessage);
     }).always(function () {
         console.log("complete");
     });
-    var $colorPicker = $(".color-picker");
-    if ($colorPicker.length > 0) {
-        var preview = function (e) {
-            $("#background").css("background-color", e.value);
-        }
 
-        $colorPicker.kendoColorPicker({
-            value: $colorPicker.val(),
-            buttons: false,
-            select: preview
-        });
-  
-    }
     var datePickerComponentEnable = function () {
         var $dateTimePicker = $(".datetimepicker-start");
         if ($dateTimePicker.length > 0) {

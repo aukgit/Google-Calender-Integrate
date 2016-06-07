@@ -22,7 +22,14 @@
         }
     </ul>*@
 
-<ul id="event-owners">
-    
-</ul>
-<div id="scheduler"></div>
+<ul id="event-owners"></ul>
+<div id="scheduler" class="k-content">
+</div>
+
+<script id="event-template" type="text/x-kendo-template">
+    <div class="event-box #= Color # #= BorderClass #">
+        <div>
+            <p>#: kendo.toString(start, "hh:mm") # - #: kendo.toString(end, "hh:mm") #</p>
+        </div>
+    </div>
+</script>

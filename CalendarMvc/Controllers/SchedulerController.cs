@@ -40,7 +40,7 @@ namespace CalendarMvc.Controllers {
             var hashCode = id.UniqueId.GetHashCode();
             Ids[hashCode] = id;
         }
-  
+
 
         public ActionResult GetOwners() {
             var owners = db.EventOwners.Select(n =>
@@ -54,13 +54,14 @@ namespace CalendarMvc.Controllers {
 
 
         public JsonResult Read() {
-            var service = App.ExchangeServiceAccess;
-            var owners = db.EventOwners.ToList();
-            var ids = Ids;
-            var kendoViewModels = service.GetEventsAsKendoSchedulerViewModel(owners, ids: ids);
-            Ids = ids;
+            //var service = App.ExchangeServiceAccess;
+            //var owners = db.EventOwners.ToList();
+            //var ids = Ids;
+            //var kendoViewModels = service.GetEventsAsKendoSchedulerViewModel(owners, ids: ids);
+            //Ids = ids;
+            var data = GetGeneratedSampleData(500);
             //var isoJson = JsonConvert.SerializeObject(kendoViewModels);
-            return Json(kendoViewModels, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Update(KendoSchedulerViewModel model) {
@@ -99,6 +100,68 @@ namespace CalendarMvc.Controllers {
         public ActionResult Index() {
 
             return View("ListEvents");
+        }
+
+        public List<KendoSchedulerViewModel> GetGeneratedSampleData(int number) {
+            var list = new List<KendoSchedulerViewModel>(number);
+            Random rnd = new Random();
+            for (int i = 0; i < number; i++) {
+                var item = new KendoSchedulerViewModel();
+                int testNum = rnd.Next(1, 101);
+
+                var start = DateTime.Now;
+                var division = Math.Ceiling(testNum / 20.0) + 2;
+                var rand2 = ((int)division ^ testNum);
+                var rand3 = division + testNum;
+                var rand4 = rand2 + rand3 + division + i;
+                start = start.AddHours(testNum * division + i + rand4 + rand2);
+                item.Start = start;
+                item.End = start.AddMinutes(testNum * 2 + division + rand3 + i);
+                if (testNum <= 33) {
+                    item.Title = "Busy : " + i;
+                    item.Email = "akarim@relisource.com";
+                    item.Description = "Rater is Busy now";
+                    item.OwnerID = rnd.Next(1, 5);
+                    item.TaskID = i;
+                    item.IsAllDay = false;
+                } else if (testNum <= 66) {
+                    item.Title = "Holiday : " + i;
+                    item.Email = "afrahman@relisource.com";
+                    item.Description = "Today is holiyday";
+                    item.OwnerID = rnd.Next(1, 5);
+                    item.TaskID = i;
+                    item.IsAllDay = false;
+                } else {
+                    item.Title = "Working : " + i;
+                    item.Email = "morahman@relisource.com";
+                    item.Description = "Rater is working";
+                    item.OwnerID = rnd.Next(1, 5);
+                    item.TaskID = i;
+                    item.IsAllDay = false;
+                }
+                item.Color = GetColorForTestKendo(testNum);
+                item.BorderClass = GetIsBorderForTestKendo(testNum);
+                list.Add(item);
+            }
+            return list;
+        }
+
+        public string GetColorForTestKendo(int testNum) {
+            if (testNum <= 33) {
+                return "blue";
+            } else if (testNum <= 66) {
+                return "orange";
+            } else {
+                return "violet";
+            }
+        }
+
+        public string GetIsBorderForTestKendo(int num) {
+            if (num > 50 && num < 60) {
+                return "red-border";
+            } else {
+                return "";
+            }
         }
     }
 }

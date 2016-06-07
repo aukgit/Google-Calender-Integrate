@@ -15,5 +15,8 @@ namespace CalendarMvc.Models.ViewModel {
         public string RecurrenceID { get; set; }
         public string RecurrenceRule { get; set; }
         public string RecurrenceException { get; set; }
+        public string BorderClass { get; set; }
+        public string Color { get; set; }
+
     }
 }
