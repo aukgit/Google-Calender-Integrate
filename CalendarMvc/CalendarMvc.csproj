@@ -313,6 +313,8 @@
     <Content Include="Content\css\kendo\images\kendoui.svg" />
     <Content Include="Content\css\kendo\images\wp8_icons.png" />
     <Content Include="Content\css\kendo\images\wp8_inverseicons.png" />
+    <Content Include="Content\css\kendo\kendo.bootstrap.min.css" />
+    <Content Include="Content\css\kendo\kendo.common-bootstrap.min.css" />
     <Content Include="Content\css\kendo\Material\editor.png" />
     <Content Include="Content\css\kendo\Material\imagebrowser.png" />
     <Content Include="Content\css\kendo\Material\indeterminate.gif" />
@@ -534,6 +536,7 @@
     <Content Include="Content\Font-Awesome\fonts\fontawesome-webfont.woff2" />
     <Content Include="Content\Font-Awesome\fonts\FontAwesome.otf" />
     <Content Include="App_Data\client_secret2.json" />
+    <Content Include="Scripts\kendo-override.js" />
     <Content Include="Scripts\custom.js" />
     <Content Include="Content\css\utilities.css.map">
       <DependentUpon>utilities.css</DependentUpon>

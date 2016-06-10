@@ -39,6 +39,7 @@ namespace CalendarMvc {
                 jsLibraryFolder + "jQueryExtend.js",
                 jsLibraryFolder + "jQueryExtend.fn.js",
                 jsLibraryFolder + "detect-browser.js",
+                jsLibraryFolder + "kendo-override.js",
                 jsLibraryFolder + "custom.js",
                 jsLibraryFolder + "respond.js"
                 ));
@@ -46,6 +47,8 @@ namespace CalendarMvc {
                     stylesFolder + "bootstrap.css",
                     stylesFolder + "kendo/kendo.common.css",
                     stylesFolder + "kendo/kendo.default.css",
+                    //stylesFolder + "kendo/kendo.common-bootstrap.min.css",
+                    //stylesFolder + "kendo/kendo.bootstrap.min.css",
                     //stylesFolder + "kendo/kendo.material.min.css",
                     stylesFolder + "bootstrap.css",
 

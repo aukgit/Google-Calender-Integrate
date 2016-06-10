@@ -16,8 +16,8 @@ namespace CalendarMvc.Controllers {
         public ActionResult Index() {
             var service = App.ExchangeServiceAccess;
             var myCalendarSharedFolders = service.GetSharedCalendarFolders();
-            var othersSharedFolders = service.GetSharedCalendarFolders("Other calendars");
-            var sharedFolders = myCalendarSharedFolders.Concat(othersSharedFolders);
+            //var othersSharedFolders = service.GetSharedCalendarFolders("Other calendars");
+            var sharedFolders = myCalendarSharedFolders;
             var eventOwner2 = db.EventOwners.FirstOrDefault(n => n.Email == App.Email);
             if (eventOwner2 == null) {
                 eventOwner2 = new EventOwner();

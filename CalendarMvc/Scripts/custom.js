@@ -1,20 +1,23 @@
-﻿$(function () {
+﻿/// <reference path="kendo-override.js" />
+$(function () {
     var controller = "/Scheduler/";
     var initializeScheduler = function (eventOwners) {
         var $scheduler = $("#scheduler");
+        
 
         $scheduler.kendoScheduler({
-            height: 1024,
+            height: 400,
             views: [
-                "day",
-                "workWeek",
-                "week",
                 { type: "month" },
-                "agenda",
-                { type: "timeline",selected: true , eventHeight: 50 }
+                { type: "timeline", selected: true, eventHeight: 16 }
             ],
-            timezone: "Etc/UTC",
+            date: kendo.date.today(),
+            //editable: false,
+            //timezone: "Etc/UTC",
+            minorTickCount:4,
             eventTemplate: $("#event-template").html(),
+            allDaySlot: false,
+            footer: false,
             dataSource: {
                 batch: true,
                 transport: {
@@ -42,9 +45,30 @@
                             result.End = result.End.toUTCString();
 
                             return options.models[0];
+                        } else if (operation === "read") {
+                            // read
                         }
+
                     }
                 },
+               
+                change: function (e) {
+                   // var start = e.start; //selection start date
+                   // var end = e.end; //selection end date
+                   // var slots = e.slots; //list of selected slots
+                   // var events = e.items; //list of selected Scheduler events
+
+                   // var message = "change:: selection from {0:g} till {1:g}";
+
+                   // if (events.length) {
+                   //     message += ". The selected event is '" + events[events.length - 1].title + "'";
+                   // }
+
+                   //console.log(message + ", start : " +  start + ", end :" + end);
+                    kendoSchedulerOverride($scheduler, eventOwners);
+                   console.log("change event");
+                },
+
                 schema: {
                     model: {
                         id: "taskId",
@@ -60,7 +84,10 @@
                             recurrenceRule: { from: "RecurrenceRule" },
                             recurrenceException: { from: "RecurrenceException" },
                             ownerId: { from: "OwnerID", defaultValue: 1 },
-                            isAllDay: { type: "boolean", from: "IsAllDay" }
+                            isAllDay: { type: "boolean", from: "IsAllDay" },
+                            color: { from: "Color" },
+                            borderClass: { from: "BorderClass" },
+
                         }
                     }
                 }

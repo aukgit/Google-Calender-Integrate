@@ -9,5 +9,7 @@ namespace CalendarMvc.Models {
         public string Email { get; set; }
         public string OwnerName { get; set; }
         public string Color { get; set; }
+        public string Timezone { get; set; }
+        public string Time { get; set; }
     }
 }

@@ -49,36 +49,60 @@
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
+.k-scheduler-timelineview tr:nth-child(1) td {
+  border-top: 2.5px solid #c5c5c5;
+}
+.k-scheduler-timelineview tr:nth-child(1) td:nth-child(2) .k-scheduler-table {
+  width: 310% !important;
+}
+.k-scheduler-timelineview tr:nth-child(1) td:nth-child(2) .k-scheduler-table tr:nth-child(1) {
+  background-color: gray;
+  border-style: solid;
+  border-width: 0 0 3px 2px;
+  color: white;
+}
+.k-scheduler-timelineview tr:nth-child(1) td:nth-child(2) .k-scheduler-table tr:nth-child(2) th {
+  background-color: #4797cc;
+  border: none;
+  border-right: 2px solid #c5c5c5;
+  color: white;
+  width: 100px;
+}
 .k-scheduler-timelineview tr:nth-child(2) .k-scheduler-times {
   height: auto !important;
 }
 .k-scheduler-timelineview tr:nth-child(2) .k-scheduler-times .k-scheduler-table {
-  height: auto !important;
-}
-.k-scheduler-timelineview tr:nth-child(2) .k-scheduler-times .k-scheduler-table tr:nth-child(2n+2) th {
-  background: #f8f8f8;
+  /*tr:nth-child(2n+2) th {
+                    background: #f8f8f8;
+                }*/
+  /*tr:hover th {
+                    background-color: #eaeaea;
+                }*/
 }
 .k-scheduler-timelineview tr:nth-child(2) .k-scheduler-times .k-scheduler-table tr {
-  height: 15px !important;
-}
-.k-scheduler-timelineview tr:nth-child(2) .k-scheduler-times .k-scheduler-table tr:hover th {
-  background-color: #eaeaea;
+  border: #909090;
 }
 .k-scheduler-timelineview tr:nth-child(2) .k-scheduler-content .k-scheduler-table {
   height: auto !important;
+  width: 310% !important;
 }
-.k-scheduler-timelineview tr:nth-child(2) .k-scheduler-content .k-scheduler-table tr {
-  height: 15px !important;
-}
-.k-scheduler-timelineview tr:nth-child(2) .k-scheduler-content .k-scheduler-table tr:nth-child(2n+1) td {
+.k-scheduler-timelineview tr:nth-child(2) .k-scheduler-content .k-scheduler-table td {
   background: white;
 }
 .k-scheduler-timelineview tr:nth-child(2) .k-scheduler-content .k-scheduler-table tr:hover td {
   background-color: #eaeaea;
 }
-.k-scheduler-times tr {
-  height: 24px !important;
+.k-scheduler-timelineview tr:nth-child(2) .k-scheduler-content .k-scheduler-table .k-today {
+  width: 2px !important;
 }
+.k-scheduler-timelineview th.active {
+  background-color: greenyellow;
+}
+/*.k-scheduler-times {
+    tr {
+        height: 24px !important;
+    }
+}*/
 .event-box {
   height: 75%;
   border: 1px solid black !important;
@@ -95,4 +119,18 @@
 .event-box.red-border {
   border: 2px solid red !important;
 }
+/*.k-header {
+    display: none;
+}*/
+/*.k-scheduler-header.k-state-default {
+    .k-scheduler-header-wrap {
+        .k-scheduler-table {
+            tr {
+                th {
+                    width: 36px;
+                }
+            }
+        }
+    }
+}*/
 /*# sourceMappingURL=calendar.css.map */

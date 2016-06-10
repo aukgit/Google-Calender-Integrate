@@ -14,6 +14,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
     public class ExchangeServiceAccess {
         private readonly string _email;
         private readonly string _password;
+        private const string _requestUrl = "https://outlook.office365.com/EWS/Exchange.asmx";
 
         private bool _isServiceCredentialsAreSet;
         private readonly ExchangeService _service;
@@ -39,6 +40,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
 
         public Uri RetriveAutoDiscoverableUri() {
             _service.AutodiscoverUrl(_email, RedirectionUrlValidationCallback);
+            //_service.Url = new Uri(_requestUrl);
             return _service.Url;
         }
 
@@ -145,7 +147,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                 try {
                     meeetings = _service.FindItems(folderId, queryFilter, view);
                 } catch (Exception ex) {
-                    Mvc.Error.HandleBy(ex, "GetEventsAsKendoSchedulerViewModel" );
+                    Mvc.Error.HandleBy(ex, "GetEventsAsKendoSchedulerViewModel");
                 }
                 AttachOrganizerProperty(ref meeetings);
                 foreach (var meeting in meeetings) {
@@ -153,7 +155,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                     m.Title = meeting.Subject;
                     m.Description = meeting.Body;
                     m.OwnerID = eventOwner.EventOwnerID;
-                    var appointment = (Appointment)meeting;
+                    var appointment = (Appointment) meeting;
                     if (ids != null) {
                         var id = appointment.Id;
                         var hashCode = id.UniqueId.GetHashCode();
@@ -164,12 +166,25 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                     m.Start = appointment.Start;
                     m.End = appointment.End;
                     m.IsAllDay = appointment.IsAllDayEvent;
+                    if (!string.IsNullOrEmpty(m.Title)) {
+                        if (m.Title.Contains("Invitation")) {
+                            m.Color = "blue";
+                        } else if (m.Title.Contains("Pending")) {
+                            m.Color = "orange";
+                        } else {
+                            m.Color = "violet";
+                        }
+                    } else {
+                        m.Color = "violet";
+
+                    }
+
+
                     list.Add(m);
                 }
             }
             return list;
 
-            return null;
         }
 
         public void AttachOrganizerProperty(ref FindItemsResults<Item> events) {
@@ -256,7 +271,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                         object groupName = null;
                         object wlinkAddressBookEid = null;
                         if (itItem.TryGetProperty(pidTagWlinkAddressBookEid, out wlinkAddressBookEid)) {
-                            var ssStoreId = (byte[])wlinkAddressBookEid;
+                            var ssStoreId = (byte[]) wlinkAddressBookEid;
                             var leLegDnStart = 0;
                             var lnLegDn = "";
                             for (var ssArraynum = ssStoreId.Length - 2; ssArraynum != 0; ssArraynum--) {
@@ -308,7 +323,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
                     try {
                         object wlinkAddressBookEid = null;
                         if (itItem.TryGetProperty(pidTagWlinkAddressBookEid, out wlinkAddressBookEid)) {
-                            var ssStoreId = (byte[])wlinkAddressBookEid;
+                            var ssStoreId = (byte[]) wlinkAddressBookEid;
                             var lnLegDn = "";
                             for (var ssArraynum = ssStoreId.Length - 2; ssArraynum != 0; ssArraynum--) {
                                 if (ssStoreId[ssArraynum] == 0) {
@@ -386,7 +401,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
         public KendoSchedulerViewModel UpdateAppointment(KendoSchedulerViewModel m, ItemId id, string[] attendees = null) {
             //Appointment meeting = new Appointment(_service);
             var item = Item.Bind(_service, id, new PropertySet(ItemSchema.Subject));
-            var appointment = (Appointment)item;
+            var appointment = (Appointment) item;
             appointment.Subject = m.Title;
             appointment.Body = m.Description;
             appointment.Start = m.Start;
@@ -409,7 +424,7 @@ namespace CalendarMvc.Modules.Calendar.Outlook {
 
         public void DestroyAppointment(ItemId id) {
             var item = Item.Bind(_service, id, new PropertySet(ItemSchema.Subject));
-            var appointment = (Appointment)item;
+            var appointment = (Appointment) item;
             try {
                 appointment.Delete(DeleteMode.MoveToDeletedItems);
             } catch (Exception ex) {

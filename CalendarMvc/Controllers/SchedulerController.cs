@@ -47,21 +47,25 @@ namespace CalendarMvc.Controllers {
                 new {
                     text = n.OwnerName,
                     value = n.EventOwnerID,
-                    color = n.Color
+                    color = n.Color,
+                    id = n.EventOwnerID,
+                    timezone = n.Timezone,
+                    time = n.Time,
+                    email = n.Email
                 }).ToList();
             return Json(owners, JsonRequestBehavior.AllowGet);
         }
 
 
         public JsonResult Read() {
-            //var service = App.ExchangeServiceAccess;
-            //var owners = db.EventOwners.ToList();
-            //var ids = Ids;
-            //var kendoViewModels = service.GetEventsAsKendoSchedulerViewModel(owners, ids: ids);
-            //Ids = ids;
-            var data = GetGeneratedSampleData(500);
+            var service = App.ExchangeServiceAccess;
+            var owners = db.EventOwners.ToList();
+            var ids = Ids;
+            var kendoViewModels = service.GetEventsAsKendoSchedulerViewModel(owners, ids: ids);
+            Ids = ids;
+            //var data = GetGeneratedSampleData(500);
             //var isoJson = JsonConvert.SerializeObject(kendoViewModels);
-            return Json(data, JsonRequestBehavior.AllowGet);
+            return Json(kendoViewModels, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Update(KendoSchedulerViewModel model) {

@@ -63,6 +63,8 @@
 }
 
 @row-height: 240px;
+@comoon-row-height: 15px;
+@table-width: 310%;
 
 .row-height(@height: 180px) {
     height: @height !important;
@@ -81,64 +83,115 @@
 .k-scheduler-timelineview {
     .border-sizing;
 
+    tr:nth-child(1) {
+        //headers
+        td {
+            border-top: 2.5px solid #c5c5c5;
+
+            &:nth-child(1) {
+                //left side
+            }
+
+            &:nth-child(2) {
+                //right side
+                .k-scheduler-table {
+                    width: @table-width !important;
+
+                    tr {
+                        &:nth-child(1) {
+                            //date
+                            background-color: gray;
+                            border-style: solid;
+                            border-width: 0 0 3px 2px;
+                            color: white;
+                            //text-align:center;
+                        }
+
+                        &:nth-child(2) {
+                            //time
+                            th {
+                                background-color: #4797cc;
+                                border: none;
+                                border-right: 2px solid #c5c5c5;
+                                color: white;
+                                width: 100px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     tr:nth-child(2) {
+        //content part
         .k-scheduler-times {
             .row-height(auto);
 
             .k-scheduler-table {
-                .row-height(auto);
-
-
-                tr:nth-child(2n+2) th {
+                //.row-height(auto);
+                /*tr:nth-child(2n+2) th {
                     background: #f8f8f8;
-                }
-
-
+                }*/
                 tr {
+                    border: #909090;
                     // left side content
-                    .row-height(15px);
+                    //.row-height(15px);
                 }
-                tr:hover th{
-                    background-color:#eaeaea;
-                    }
+                /*tr:hover th {
+                    background-color: #eaeaea;
+                }*/
             }
         }
+
+
 
         .k-scheduler-content {
             .k-scheduler-table {
                 // right side content area
                 .row-height(auto);
+                width: @table-width !important;
 
                 tr {
                     // right side
-                    .row-height(15px);
-
+                    //.row-height(@comoon-row-height);
                     td {
                         // content cell
                         //.width-important(12px);
+                        //.row-height(23px);
                     }
                 }
 
-                tr:nth-child(2n+1) td {
+                td {
                     background: white;
                 }
-                tr:hover td{
-                    background-color:#eaeaea;
-                    }
+
+                tr:hover td {
+                    background-color: #eaeaea;
+                }
+
+                .k-today {
+                    width: 2px !important;
+                }
             }
         }
     }
 
-
+    th.active {
+        background-color: greenyellow;
+    }
 }
 
 
-
-.k-scheduler-times {
+.k-scheduler-table {
+    //table-layout: unset;
+    //max-width: 100%;
+}
+/*.k-scheduler-times {
     tr {
         height: 24px !important;
     }
-}
+}*/
 
 .event-box {
     height: 75%;
@@ -160,3 +213,21 @@
         border: 2px solid red !important;
     }
 }
+
+/*.k-header {
+    display: none;
+}*/
+
+
+
+/*.k-scheduler-header.k-state-default {
+    .k-scheduler-header-wrap {
+        .k-scheduler-table {
+            tr {
+                th {
+                    width: 36px;
+                }
+            }
+        }
+    }
+}*/
