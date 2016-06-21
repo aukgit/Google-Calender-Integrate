@@ -23,8 +23,39 @@
     </ul>*@
 
 <ul id="event-owners"></ul>
+<div class="top-container">
+    @using (Html.BeginForm("CreateEvent", "Scheduler", FormMethod.Post, new { @id = "example-form" })) {
+        <div class="inline-Block block">
+            <div>
+                <p>Notification Date:</p>
+                <input type="date" name="notificationDate" id="notification-date">
+            </div>
+            <div>
+                <p>Notification Time:</p>
+                <input type="text" value="01:00 PM" name="notificationTime" id="notification-time">
+            </div>
+            <div>
+                <p>Schedule Date:</p>
+                <input type="date" name="scheduleDate" id="schedule-date">
+            </div>
+            <div>
+                <p>Schedule Time:</p>
+                <input type="text" value="05:00 PM" name="scheduleTime" id="schedule-time">
+            </div>
+            <div>
+                <p>Subject Visit Comment:</p>
+                <input type="text" name="subjectVisitComment" id="subject-visit-comment">
+            </div>
+        </div>
+        @Html.Hidden("ownerId", null, new { @id = "owner-id-hidden" })
+        <input type="submit" value="Create Event" class="btn btn-success" />
+    }
+</div>
+<hr>
+
 <div id="scheduler" class="k-content">
 </div>
+
 
 <script id="event-template" type="text/x-kendo-template">
     <div class="event-box #= color # #= borderClass #">

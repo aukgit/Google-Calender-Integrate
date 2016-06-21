@@ -134,7 +134,7 @@
                     background: #f8f8f8;
                 }*/
                 tr {
-                    border: #909090;
+                    //border: #909090;
                     // left side content
                     //.row-height(15px);
                 }
@@ -153,12 +153,10 @@
                 width: @table-width !important;
 
                 tr {
-                    // right side
-                    //.row-height(@comoon-row-height);
-                    td {
-                        // content cell
-                        //.width-important(12px);
-                        //.row-height(23px);
+                    &.active {
+                        td {
+                            background-color: greenyellow;
+                        }
                     }
                 }
 
@@ -171,7 +169,7 @@
                 }
 
                 .k-today {
-                    width: 2px !important;
+                   // width: 2px !important;
                 }
             }
         }
@@ -212,6 +210,26 @@
     &.red-border {
         border: 2px solid red !important;
     }
+}
+
+.inline-Block div {
+    display: inline-block;
+}
+
+.block div {
+    padding: 0 40px 0 50px;
+}
+
+.top-container #Subject-visit-comment {
+    width: 300px;
+    height: 20px;
+}
+
+.top-container {
+    margin-bottom: 20px;
+}
+.middle-container {
+    margin-bottom: 20px;
 }
 
 /*.k-header {

@@ -1,12 +1,19 @@
 ﻿/// <reference path="kendo-override.js" />
+Date.prototype.yyyymmdd = function () {
+    var yyyy = this.getFullYear().toString();
+    var mm = (this.getMonth() + 1).toString(); // getMonth() is zero-based
+    var dd = this.getDate().toString();
+    return yyyy + (mm[1] ? mm : "0" + mm[0]) + (dd[1] ? dd : "0" + dd[0]); // padding
+};
 $(function () {
     var controller = "/Scheduler/";
+    var kendoControl;
     var initializeScheduler = function (eventOwners) {
         var $scheduler = $("#scheduler");
         
 
-        $scheduler.kendoScheduler({
-            height: 400,
+        kendoControl = $scheduler.kendoScheduler({
+            height: 600,
             views: [
                 { type: "month" },
                 { type: "timeline", selected: true, eventHeight: 16 }
@@ -146,7 +153,7 @@ $(function () {
     }).fail(function (jqXHR, textStatus, exceptionMessage) {
         console.log("Request failed: " + exceptionMessage);
     }).always(function () {
-        console.log("complete");
+        //console.log("complete");
     });
 
     var datePickerComponentEnable = function () {

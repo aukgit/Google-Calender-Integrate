@@ -21,6 +21,32 @@ namespace CalendarMvc.Controllers {
             _eventOwnerLogic = new EventOwnerLogic(db);
         }
 
+        public ActionResult CreateEvent(string notificationDate, string notificationTime,
+            string scheduleDate, string scheduleTime, string subjectVisitComment, int ownerId) {
+            var notiTime = notificationDate + " " + notificationTime;
+            var nt = DateTime.Parse(notiTime);
+            var schTime = scheduleDate + " " + scheduleTime;
+            var st = DateTime.Parse(schTime);
+            var service = App.ExchangeServiceAccess;
+            var kendoViewModel = new KendoSchedulerViewModel();
+            string[] attendees = _eventOwnerLogic.GetAttendees(ownerId);
+            
+            kendoViewModel.OwnerID = ownerId;
+            kendoViewModel.Title = subjectVisitComment;
+            kendoViewModel.Description = subjectVisitComment;
+            kendoViewModel.Start = st;
+            kendoViewModel.End = st.AddMinutes(90);
+
+            var createdAppointment = service.WriteEventInCalendar(
+                 kendoViewModel.Title,
+                 kendoViewModel.Description,
+                 kendoViewModel.Start,
+                 kendoViewModel.End,
+                 attendees: attendees);
+            SaveTaskId(createdAppointment);
+            //return Json(kendoViewModel, JsonRequestBehavior.AllowGet);
+            return RedirectToAction("Index");
+        }
         private Dictionary<int, ItemId> Ids {
             get {
                 _ids = HttpContext.Cache["_ids"] as Dictionary<int, ItemId>;
